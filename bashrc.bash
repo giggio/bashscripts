@@ -35,6 +35,9 @@ xterm*|rxvt*)
     ;;
 esac
 
+if cat /proc/version | grep Microsoft > /dev/null; then
+  export WSL=true
+fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
@@ -52,4 +55,12 @@ fi
 export EDITOR=vim
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/bin:$PATH"
-export DOCKER_HOST=':2375'
+if [ -d  /usr/local/go/bin ]; then
+  export PATH=$PATH:/usr/local/go/bin
+fi
+if [ "$WSL" ]; then
+  export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
+  if ! pgrep socat > /dev/null; then
+    tmux new -s docker-relay-session -d docker-relay
+  fi
+fi

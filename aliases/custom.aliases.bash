@@ -28,3 +28,4 @@ alias pull='git pull'
 alias fixup='git fixup'
 alias dif='git diff'
 alias git=hub
+alias k=kubectl
