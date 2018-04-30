@@ -27,5 +27,7 @@ alias push='git push'
 alias pull='git pull'
 alias fixup='git fixup'
 alias dif='git diff'
-alias git=hub
+if hash hub 2>/dev/null; then
+  alias git=hub
+fi
 alias k=kubectl
