@@ -30,4 +30,6 @@ alias dif='git diff'
 if hash hub 2>/dev/null; then
   alias git=hub
 fi
-alias k=kubectl
+if hash kubectl 2>/dev/null; then
+  alias k=kubectl
+fi
