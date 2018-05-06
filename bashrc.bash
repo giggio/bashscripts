@@ -64,3 +64,8 @@ if [ "$WSL" ]; then
     tmux new -s docker-relay-session -d docker-relay
   fi
 fi
+if [ "$WSL" ]; then
+  function removeWindowsFromPath {
+    echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
+  }
+fi
