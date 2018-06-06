@@ -1,3 +1,6 @@
 [submodule "lib/z"]
 	path = lib/z
 	url = https://github.com/rupa/z.git
+[submodule "lib/complete-alias"]
+	path = lib/complete-alias
+	url = https://github.com/cykerway/complete-alias.git
