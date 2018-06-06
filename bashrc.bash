@@ -69,3 +69,5 @@ if [ "$WSL" ]; then
     echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
   }
 fi
+
+export GPG_TTY=$(tty)
