@@ -1,3 +1,3 @@
 if [ -d "$HOME/.kube" ]; then
-  export KUBECONFIG=$(find $HOME/.kube -maxdepth 1 -type f ! -name *.backup |  paste -sd ":" -)
+  export KUBECONFIG=$HOME/.kube/config:$(find $HOME/.kube -maxdepth 1 -type f ! -name *.backup ! -name config |  paste -sd ":" -)
 fi
