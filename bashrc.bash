@@ -1,3 +1,5 @@
+THIS_FILE=$BASH_SOURCE
+THIS_DIR=`dirname $THIS_FILE`
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -58,6 +60,7 @@ export PATH="$HOME/bin:$PATH"
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
+if [[ -x "$THIS_DIR/lib/kubectx/kubectx" ]]; then export PATH="$PATH:$THIS_DIR/lib/kubectx"; fi
 if [ "$WSL" ]; then
   export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
   if ! pgrep socat > /dev/null; then
