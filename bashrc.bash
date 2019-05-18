@@ -37,9 +37,6 @@ xterm*|rxvt*)
     ;;
 esac
 
-if cat /proc/version | grep Microsoft > /dev/null; then
-  export WSL=true
-fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
@@ -54,23 +51,11 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export EDITOR=vim
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/bin:$PATH"
+if hash vim 2>/dev/null; then
+  export EDITOR=vim
+fi
+export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
-if [[ -x "$THIS_DIR/lib/kubectx/kubectx" ]]; then export PATH="$PATH:$THIS_DIR/lib/kubectx"; fi
-if [ "$WSL" ]; then
-  export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
-  if ! pgrep socat > /dev/null; then
-    tmux new -s docker-relay-session -d docker-relay
-  fi
-fi
-if [ "$WSL" ]; then
-  function removeWindowsFromPath {
-    echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
-  }
-fi
-
 export GPG_TTY=$(tty)
