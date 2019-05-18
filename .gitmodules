@@ -7,3 +7,6 @@
 [submodule "lib/kubectx"]
 	path = lib/kubectx
 	url = https://github.com/ahmetb/kubectx.git
+[submodule "lib/n"]
+	path = lib/n
+	url = https://github.com/tj/n.git

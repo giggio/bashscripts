@@ -54,8 +54,9 @@ fi
 if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
-export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH"
+export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$HOME/.n/bin:$PATH"
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
 export GPG_TTY=$(tty)
+export N_PREFIX=$HOME/.n
