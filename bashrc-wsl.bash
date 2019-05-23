@@ -10,7 +10,9 @@ function removeWindowsFromPath {
 if ! pgrep socat > /dev/null; then
   tmux new -s docker-relay-session -d docker-relay
 fi
+pushd /mnt/c > /dev/null
 export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
+popd > /dev/null
 if [ "$WHOME" == "$(pwd)" ]; then
   cd
 fi
