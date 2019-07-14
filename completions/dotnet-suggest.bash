@@ -1,0 +1,26 @@
+if hash dotnet-suggest 2>/dev/null; then
+  # dotnet suggest shell complete script start
+  _dotnetsuggest_bash_complete()
+  {
+    local fullpath=`type -p ${COMP_WORDS[0]}`
+    local escaped_comp_line=$(echo "$COMP_LINE" | sed s/\"/'\\\"'/g)
+    local completions=`dotnet-suggest get --executable "${fullpath}" --position ${COMP_POINT} -- "${escaped_comp_line}"`
+    if [ "${#COMP_WORDS[@]}" != "2" ]; then
+      return
+    fi
+    local IFS=$'\n'
+    local suggestions=($(compgen -W "$completions"))
+    if [ "${#suggestions[@]}" == "1" ]; then
+      local number="${suggestions[0]/%\ */}"
+      COMPREPLY=("$number")
+    else
+      for i in "${!suggestions[@]}"; do
+        suggestions[$i]="$(printf '%*s' "-$COLUMNS"  "${suggestions[$i]}")"
+      done
+      COMPREPLY=("${suggestions[@]}")
+    fi
+  }
+  complete -F _dotnetsuggest_bash_complete `dotnet-suggest list`
+  export DOTNET_SUGGEST_SCRIPT_VERSION="1.0.0"
+  # dotnet suggest shell complete script end
+fi
