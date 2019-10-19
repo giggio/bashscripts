@@ -42,3 +42,7 @@ if hash kubectl 2>/dev/null; then
   alias k=kubectl
   complete -F _complete_alias k
 fi
+if hash istioctl 2>/dev/null; then
+  alias istio=istioctl
+  complete -F _complete_alias istio
+fi
