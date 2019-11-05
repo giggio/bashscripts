@@ -14,8 +14,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=20000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -60,3 +60,4 @@ if [ -d  /usr/local/go/bin ]; then
 fi
 export GPG_TTY=$(tty)
 export N_PREFIX=$HOME/.n
+export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
