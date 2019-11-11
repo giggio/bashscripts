@@ -29,6 +29,8 @@ alias ci='git commit'
 complete -F _complete_alias ci
 alias push='git push'
 complete -F _complete_alias push
+alias co='git checkout'
+complete -F _complete_alias co
 alias pull='git pull'
 complete -F _complete_alias pull
 alias fixup='git fixup'
@@ -45,4 +47,8 @@ fi
 if hash istioctl 2>/dev/null; then
   alias istio=istioctl
   complete -F _complete_alias istio
+fi
+if hash terraform 2>/dev/null; then
+  alias tf=terraform
+  complete -F _complete_alias tf
 fi
