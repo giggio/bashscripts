@@ -61,3 +61,6 @@ fi
 export GPG_TTY=$(tty)
 export N_PREFIX=$HOME/.n
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+set -o vi
+bind '"jj":"\e"'
+
