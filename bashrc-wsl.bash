@@ -16,3 +16,6 @@ popd > /dev/null
 if [ "$WHOME" == "$(pwd)" ]; then
   cd
 fi
+if hash wslfetch 2>/dev/null; then
+  wslfetch
+fi
