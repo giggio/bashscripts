@@ -52,6 +52,6 @@ if hash terraform 2>/dev/null; then
   alias tf=terraform
   complete -F _complete_alias tf
 fi
-if hash pygmentize; then
+if hash pygmentize 2>/dev/null; then
   alias ccat='pygmentize -g -O style=vs -f console16m'
 fi
