@@ -1,4 +1,4 @@
-if cat /proc/version | grep Microsoft > /dev/null; then
+if [ -f /proc/version ] && cat /proc/version | grep Microsoft > /dev/null; then
   export WSL=true
 fi
 if [ ! "$WSL" = 'true' ]; then return; fi
