@@ -7,8 +7,10 @@ export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
 function removeWindowsFromPath {
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
-if ! pgrep socat > /dev/null; then
-  tmux new -s docker-relay-session -d docker-relay
+if hash tmux 2>/dev/null && hash docker-relay 2>/dev/null; then
+  if ! pgrep socat > /dev/null; then
+    tmux new -s docker-relay-session -d docker-relay
+  fi
 fi
 pushd /mnt/c > /dev/null
 export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
