@@ -1,12 +1,26 @@
 if [ -f /proc/version ] && cat /proc/version | grep Microsoft > /dev/null; then
   export WSL=true
 fi
+function removeWindowsFromPath {
+  if ! $WSL; then
+    echo $PATH
+    return
+  fi
+  echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
+}
+function hasBinary {
+  hash $1 2>/dev/null
+}
+function hasBinaryInLinux {
+  if ! $WSL; then
+    hasBinary
+    return
+  fi
+  PATH=`removeWindowsFromPath` hash $1 2>/dev/null
+}
 if [ ! "$WSL" = 'true' ]; then return; fi
 # put your script here for WSL only
 export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
-function removeWindowsFromPath {
-  echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
-}
 if hash tmux 2>/dev/null && hash docker-relay 2>/dev/null; then
   if ! pgrep socat > /dev/null; then
     tmux new -s docker-relay-session -d docker-relay

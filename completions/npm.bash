@@ -1,3 +1,3 @@
-if hash npm 2>/dev/null; then
+if hasBinaryInLinux npm; then
   source <(npm completion)
 fi
