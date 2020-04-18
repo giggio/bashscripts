@@ -64,4 +64,5 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
 bind '"jj":"\e"'
+tabs -4
 
