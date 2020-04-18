@@ -8,16 +8,6 @@ function removeWindowsFromPath {
   fi
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
-function hasBinary {
-  hash $1 2>/dev/null
-}
-function hasBinaryInLinux {
-  if ! $WSL; then
-    hasBinary
-    return
-  fi
-  PATH=`removeWindowsFromPath` hash $1 2>/dev/null
-}
 if [ ! "$WSL" = 'true' ]; then return; fi
 if [ -v WSL_INTEROP ]; then
   export WSLVersion=2
