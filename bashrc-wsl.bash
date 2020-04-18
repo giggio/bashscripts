@@ -26,7 +26,9 @@ fi
 pushd /mnt/c > /dev/null
 # start cron, add '%sudo ALL=NOPASSWD: /etc/init.d/cron start' via visudo if this fails
 if ! pgrep cron > /dev/null; then
-  sudo /etc/init.d/cron start > /dev/null
+  if [ -f /etc/init.d/cron ]; then
+    sudo /etc/init.d/cron start > /dev/null
+  fi
 fi
 export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
 popd > /dev/null
