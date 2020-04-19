@@ -9,7 +9,15 @@ function removeWindowsFromPath {
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
 if [ ! "$WSL" = 'true' ]; then return; fi
-if [ -v WSL_INTEROP ]; then
+IS_SSH=false
+if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
+  IS_SSH=true
+else
+  case $(ps -o comm= -p $PPID) in
+    sshd|*/sshd) IS_SSH=true;;
+  esac
+fi
+if [ -v WSL_INTEROP ] || [ -v WSL_INTEGRATION_CACHE ]; then
   export WSLVersion=2
 else
   export WSLVersion=1
@@ -23,17 +31,19 @@ if [ "$WSLVersion" == "1" ]; then
     fi
   fi
 fi
-pushd /mnt/c > /dev/null
 # start cron, add '%sudo ALL=NOPASSWD: /etc/init.d/cron start' via visudo if this fails
 if ! pgrep cron > /dev/null; then
   if [ -f /etc/init.d/cron ]; then
     sudo /etc/init.d/cron start > /dev/null
   fi
 fi
-export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
-popd > /dev/null
-if [ "$WHOME" == "$(pwd)" ]; then
-  cd
+if hash cmd.exe 2> /dev/null; then
+  pushd /mnt/c > /dev/null
+  export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
+  popd > /dev/null
+  if [ "$WHOME" == "$(pwd)" ]; then
+    cd
+  fi
 fi
 if hash wslfetch 2>/dev/null; then
   wslfetch
