@@ -2,7 +2,7 @@
 
 # if on WSL2 add this to a cron to run every minute
 # to limit the number of the log file run:
-# tail -n 20 /var/log/cacheclean > /var/log/cacheclean
+# echo "$(tail -n 20 /var/log/cacheclean)" > /var/log/cacheclean
 
 DATE_FORMAT=+%a\ %F\ %T\ %Z
 if [ "$(whoami)" != "root" ]; then
