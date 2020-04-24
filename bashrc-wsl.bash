@@ -1,5 +1,7 @@
 if grep [Mm]icrosoft /proc/version > /dev/null; then
   export WSL=true
+else
+  export WSL=false
 fi
 function removeWindowsFromPath {
   if ! $WSL; then
@@ -8,7 +10,7 @@ function removeWindowsFromPath {
   fi
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
-if [ ! "$WSL" = 'true' ]; then return; fi
+if ! $WSL; then return; fi
 IS_SSH=false
 if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
   IS_SSH=true
