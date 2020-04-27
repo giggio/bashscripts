@@ -43,12 +43,12 @@ esac
 if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
-export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$HOME/.n/bin:$PATH"
+export N_PREFIX=$HOME/.n
+export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$N_PREFIX/bin:$PATH"
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
 export GPG_TTY=$(tty)
-export N_PREFIX=$HOME/.n
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
