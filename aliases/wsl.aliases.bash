@@ -8,3 +8,4 @@ alias clip=clip.exe
 alias notepad=notepad.exe
 alias wt=wt.exe
 alias ver='pushd /mnt/c > /dev/null;cmd.exe /c ver; pushd > /dev/null'
+alias gitk=gitk.exe
