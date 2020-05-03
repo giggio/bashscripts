@@ -55,13 +55,15 @@ export WINDOWS_IP_ADDRESS=`ipconfig.exe | grep WSL -A3 | tail -n 1 | awk '{print
 
 # start proxy to Windows. Necessary until https://github.com/microsoft/WSL/issues/4517#issuecomment-621832142
 # is fixed. See comment for details.
-if ! powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
-  if hash cow-taskbar.exe 2> /dev/null; then
-    cow-taskbar.exe &
-    disown
+function proxyvpn {
+  if ! powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
+    if hash cow-taskbar.exe 2> /dev/null; then
+      cow-taskbar.exe &
+      disown
+    fi
   fi
-fi
-if powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
-  export https_proxy="http://$WINDOWS_IP_ADDRESS:7777"
-  export http_proxy="http://$WINDOWS_IP_ADDRESS:7777"
-fi
+  if powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
+    export https_proxy="http://$WINDOWS_IP_ADDRESS:7777"
+    export http_proxy="http://$WINDOWS_IP_ADDRESS:7777"
+  fi
+}
