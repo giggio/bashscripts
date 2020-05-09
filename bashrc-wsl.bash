@@ -67,3 +67,9 @@ function proxyvpn {
     export http_proxy="http://$WINDOWS_IP_ADDRESS:7777"
   fi
 }
+
+# TODO: remove when https://github.com/dotnet/aspnetcore/issues/7246 is fixed
+if [ -f $HOME/certs/dotnet.pfx ]; then
+  export Kestrel__Certificates__Default__Path=$HOME/certs/dotnet.pfx
+  export Kestrel__Certificates__Default__Password=''
+fi
