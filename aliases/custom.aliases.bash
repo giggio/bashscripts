@@ -1,3 +1,5 @@
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -45,7 +47,11 @@ if hash hub 2>/dev/null; then
   alias git=hub
 fi
 if hash kubectl 2>/dev/null; then
-  alias k=kubectl
+  if [ -f $DIR/../lib/kubectl-aliases/.kubectl_aliases ]; then
+    source $DIR/../lib/kubectl-aliases/.kubectl_aliases
+  else
+    alias k=kubectl
+  fi
   complete -F _complete_alias k
 fi
 if hash istioctl 2>/dev/null; then

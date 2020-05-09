@@ -10,3 +10,6 @@
 [submodule "lib/n"]
 	path = lib/n
 	url = https://github.com/tj/n.git
+[submodule "lib/kubectl-aliases"]
+	path = lib/kubectl-aliases
+	url = https://github.com/ahmetb/kubectl-aliases.git
