@@ -49,10 +49,14 @@ fi
 if hash kubectl 2>/dev/null; then
   if [ -f $DIR/../lib/kubectl-aliases/.kubectl_aliases ]; then
     source $DIR/../lib/kubectl-aliases/.kubectl_aliases
+    ALIASES=`awk -F'[ =]' '/^alias / {print $2}' $DIR/../lib/kubectl-aliases/.kubectl_aliases`
+    for ALIAS in $ALIASES; do
+      complete -F _complete_alias $ALIAS
+    done
   else
     alias k=kubectl
+    complete -F _complete_alias k
   fi
-  complete -F _complete_alias k
 fi
 if hash istioctl 2>/dev/null; then
   alias istio=istioctl
