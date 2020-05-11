@@ -54,3 +54,4 @@ export LC_ALL=en_US.UTF-8
 set -o vi
 bind '"jj":"\e"'
 tabs -4
+export DOCKER_BUILDKIT=1
