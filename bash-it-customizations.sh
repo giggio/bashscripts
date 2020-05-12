@@ -1,5 +1,6 @@
 export POWERLINE_RIGHT_PROMPT="clock"
-export export POWERLINE_LEFT_PROMPT="scm cwd"
+export POWERLINE_LEFT_PROMPT='k8s_context cwd scm in_vim'
+export POWERLINE_RIGHT_PROMPT='clock'
 export SCM_THEME_PROMPT_CLEAN_COLOR=2
 export SCM_THEME_PROMPT_DIRTY_COLOR=220
 export CWD_THEME_PROMPT_COLOR=18
