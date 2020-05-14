@@ -67,6 +67,10 @@ function proxyvpn {
     export http_proxy="http://$WINDOWS_IP_ADDRESS:7777"
   fi
 }
+# also related to the same issue, another workaround (and better): https://github.com/microsoft/WSL/issues/4517#issuecomment-628701283
+function setMTU {
+  sudo ifconfig eth0 mtu 1400
+}
 
 # TODO: remove when https://github.com/dotnet/aspnetcore/issues/7246 is fixed
 if [ -f $HOME/certs/dotnet.pfx ]; then
