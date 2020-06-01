@@ -3,7 +3,7 @@ function hasBinary {
 }
 function hasBinaryInLinux {
   if ! $WSL; then
-    hasBinary
+    hasBinary $1
     return
   fi
   PATH=`removeWindowsFromPath` hash $1 2>/dev/null
