@@ -48,6 +48,9 @@ export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$N_PREFIX/bin:$PATH"
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
+if [ -d  $HOME/.dotnet/tools ]; then
+  export PATH=$PATH:$HOME/.dotnet/tools
+fi
 export GPG_TTY=$(tty)
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
