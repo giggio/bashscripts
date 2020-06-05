@@ -10,7 +10,12 @@ function removeWindowsFromPath {
   fi
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
-if ! $WSL; then return; fi
+if grep docker /proc/1/cgroup -qa; then
+  export RUNNING_IN_CONTAINER=true
+else
+  export RUNNING_IN_CONTAINER=false
+fi
+if ! $WSL || $RUNNING_IN_CONTAINER; then return; fi
 IS_SSH=false
 if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
   IS_SSH=true
