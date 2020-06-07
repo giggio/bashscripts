@@ -52,9 +52,11 @@ if hash cmd.exe 2> /dev/null; then
     cd
   fi
 fi
-if hash wslfetch 2>/dev/null; then
-  wslfetch
-fi
+
+# Do not run wslfetch, it is really slow to start, it adds several seconds to bash's startup.
+# if hash wslfetch 2>/dev/null; then
+#   wslfetch
+# fi
 
 export WINDOWS_IP_ADDRESS=`ipconfig.exe | grep WSL -A3 | tail -n 1 | awk '{print $NF}' | tr -d '\r\n'`
 
