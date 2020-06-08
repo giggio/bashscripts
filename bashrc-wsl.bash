@@ -16,6 +16,7 @@ else
   export RUNNING_IN_CONTAINER=false
 fi
 if ! $WSL || $RUNNING_IN_CONTAINER; then return; fi
+# put your script here for WSL only
 IS_SSH=false
 if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
   IS_SSH=true
@@ -29,7 +30,6 @@ if [ -v WSL_INTEROP ] || [ -v WSL_INTEGRATION_CACHE ]; then
 else
   export WSLVersion=1
 fi
-# put your script here for WSL only
 if [ "$WSLVersion" == "1" ]; then
   export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
   if hash tmux 2>/dev/null && hash docker-relay 2>/dev/null; then
