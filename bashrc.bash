@@ -43,8 +43,17 @@ esac
 if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
-export N_PREFIX=$HOME/.n
-export PATH="$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$N_PREFIX/bin:$PATH"
+export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
+N_PREFIX=$HOME/.n
+if [ -d $N_PREFIX ]; then
+  export PATH=$N_PREFIX/bin:$PATH
+  export N_PREFIX
+fi
+DENO_INSTALL=$HOME/.deno
+if [ -d $DENO_INSTALL ]; then
+  export PATH=$DENO_INSTALL/bin:$PATH
+  export DENO_INSTALL
+fi
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
 fi
