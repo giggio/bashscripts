@@ -67,3 +67,4 @@ set -o vi
 bind '"jj":"\e"'
 tabs -4
 export DOCKER_BUILDKIT=1
+export INPUTRC=$THIS_DIR/.inputrc
