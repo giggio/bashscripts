@@ -43,6 +43,7 @@ alias fixup='git fixup'
 complete -F _complete_alias fixup
 alias dif='git diff'
 complete -F _complete_alias dif
+alias pushsync='git push --set-upstream origin `git rev-parse --abbrev-ref HEAD`'
 if hash hub 2>/dev/null; then
   alias git=hub
 fi
