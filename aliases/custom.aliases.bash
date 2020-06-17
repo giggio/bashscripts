@@ -1,4 +1,5 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/../lib/complete-alias/complete_alias
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
