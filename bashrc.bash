@@ -70,6 +70,9 @@ fi
 if [ -d  $HOME/.dotnet/tools ]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
+if ! hash rustc 2>/dev/null || [ -d $HOME/.cargo/bin ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
 export GPG_TTY=$(tty)
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
