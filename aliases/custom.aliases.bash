@@ -66,8 +66,7 @@ if hash istioctl 2>/dev/null; then
   complete -F _complete_alias istio
 fi
 if hash terraform 2>/dev/null; then
-  alias tf=terraform
-  complete -F _complete_alias tf
+  alias tf=terraform # completions for alias are on completions file for Terraform
 fi
 if hash pygmentize 2>/dev/null; then
   alias ccat='pygmentize -g -O style=vs -f console16m'
