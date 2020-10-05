@@ -72,3 +72,5 @@ fi
 if hash pygmentize 2>/dev/null; then
   alias ccat='pygmentize -g -O style=vs -f console16m'
 fi
+alias cd-='cd -'
+alias cd..='cd ..'
