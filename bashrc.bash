@@ -50,19 +50,12 @@ if [ -d $N_PREFIX ]; then
   export N_PREFIX
 fi
 export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
-DVM_DIR=$HOME/.dvm
-DVM_BIN_DIR=$DVM_DIR/bin
-if [ -x $DVM_BIN_DIR/dvm ]; then
-  export PATH=$DVM_BIN_DIR:$PATH
-  export DVM_DIR
-fi
-DENO_INSTALL=$HOME/.deno
-if hash dvm 2>/dev/null || [ -x DENO_INSTALL/bin/deno ]; then
+DENO_INSTALL=$HOME/.deno/bin
+if hash dvm 2>/dev/null || [ -x DENO_INSTALL/deno ]; then
   if ! [ -d $DENO_INSTALL ]; then
     mkdir -p $DENO_INSTALL
   fi
-  export PATH=$DENO_INSTALL/bin:$PATH
-  export DENO_INSTALL
+  export PATH=$DENO_INSTALL:$PATH
 fi
 if [ -d  /usr/local/go/bin ]; then
   export PATH=$PATH:/usr/local/go/bin
