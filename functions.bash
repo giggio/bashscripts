@@ -8,3 +8,14 @@ function hasBinaryInLinux {
   fi
   PATH=`removeWindowsFromPath` hash $1 2>/dev/null
 }
+
+function man {
+    case "$(type -t -- "$1")" in
+    builtin|keyword)
+        help -m "$1" | less
+        ;;
+    *)
+        command man "$@"
+        ;;
+    esac
+}
