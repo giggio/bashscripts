@@ -66,6 +66,9 @@ fi
 if ! hash rustc 2>/dev/null || [ -d $HOME/.cargo/bin ]; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
+if [ -e $HOME/.krew/bin/kubectl-krew ]; then
+  export PATH=$PATH:$HOME/.krew/bin
+fi
 export GPG_TTY=$(tty)
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
