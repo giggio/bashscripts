@@ -73,3 +73,4 @@ if hash pygmentize 2>/dev/null; then
 fi
 alias cd-='cd -'
 alias cd..='cd ..'
+alias weather='curl -s wttr.in'
