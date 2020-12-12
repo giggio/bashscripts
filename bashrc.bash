@@ -63,8 +63,8 @@ fi
 if [ -d  $HOME/.dotnet/tools ]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
-if ! hash rustc 2>/dev/null || [ -d $HOME/.cargo/bin ]; then
-  export PATH="$HOME/.cargo/bin:$PATH"
+if [ -f $HOME/.cargo/env ]; then
+  source "$HOME/.cargo/env"
 fi
 if [ -e $HOME/.krew/bin/kubectl-krew ]; then
   export PATH=$PATH:$HOME/.krew/bin
