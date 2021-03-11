@@ -69,6 +69,12 @@ fi
 if [ -e $HOME/.krew/bin/kubectl-krew ]; then
   export PATH=$PATH:$HOME/.krew/bin
 fi
+if [ -e $HOME/.go/bin/go ]; then
+  export PATH=$PATH:$HOME/.go/bin
+  if [ -d $HOME/go/bin ]; then
+    export PATH=$PATH:$HOME/go/bin
+  fi
+fi
 export GPG_TTY=$(tty)
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
