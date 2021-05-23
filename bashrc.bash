@@ -83,3 +83,10 @@ bind '"jj":"\e"'
 tabs -4
 export DOCKER_BUILDKIT=1
 export INPUTRC=$THIS_DIR/.inputrc
+
+if hash starship 2>/dev/null; then
+  eval "$(starship init bash)"
+else
+  echo "Install Starship to get a nice theme. Go to: https://starship.rs/"
+fi
+

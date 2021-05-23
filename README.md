@@ -19,7 +19,6 @@ Installation
 # Load Bash It
 export BASH_IT_CUSTOM="$HOME/bashscripts/"
 source "$BASH_IT"/bash_it.sh
-source "$BASH_IT_CUSTOM"/bash-it-customizations.sh
 ````
 
 Author
