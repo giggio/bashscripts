@@ -84,6 +84,8 @@ tabs -4
 export DOCKER_BUILDKIT=1
 export INPUTRC=$THIS_DIR/.inputrc
 
+bind 'set completion-ignore-case on'
+
 if hash starship 2>/dev/null; then
   eval "$(starship init bash)"
 else
