@@ -66,6 +66,9 @@ fi
 if [ -f $HOME/.cargo/env ]; then
   source "$HOME/.cargo/env"
 fi
+if hash sccache 2>/dev/null; then
+  export RUSTC_WRAPPER=sccache
+fi
 if [ -e $HOME/.krew/bin/kubectl-krew ]; then
   export PATH=$PATH:$HOME/.krew/bin
 fi
