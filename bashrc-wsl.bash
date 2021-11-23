@@ -86,6 +86,9 @@ if [ -f $HOME/certs/dotnet.pfx ]; then
   export Kestrel__Certificates__Default__Password=''
 fi
 
+if hash wslview 2>/dev/null; then
+  export BROWSER=`which wslview`
+fi
 
 # resolve `winhost` as windows ip, see issue and comment: https://github.com/microsoft/WSL/issues/4619#issuecomment-821142078
 # and https://github.com/microsoft/WSL/issues/4619#issuecomment-966435432
