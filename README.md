@@ -5,6 +5,9 @@ These are the files that accompany my
 [Bash-it](https://github.com/Bash-it/bash-it)
 installation.
 
+This repo will work better with
+[my dotfiles](https://github.com/giggio/dotfiles).
+
 Installation
 ------
 
