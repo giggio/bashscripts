@@ -11,8 +11,12 @@ function removeWindowsFromPath {
   fi
   echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
 }
-if grep docker /proc/1/cgroup -qa; then
-  export RUNNING_IN_CONTAINER=true
+if [ -f /proc/1/cgroup ]; then
+  if grep docker /proc/1/cgroup -qa; then
+    export RUNNING_IN_CONTAINER=true
+  else
+    export RUNNING_IN_CONTAINER=false
+  fi
 else
   export RUNNING_IN_CONTAINER=false
 fi
