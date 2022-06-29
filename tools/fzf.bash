@@ -6,10 +6,10 @@ if [[ ! "$PATH" == */$HOME/.fzf/bin* ]]; then
 fi
 
 # Auto-completion
-[[ $- == *i* ]] && source "/$HOME/.fzf/shell/completion.bash" 2> /dev/null
+[[ $- == *i* ]] && source "$HOME/.fzf/shell/completion.bash" 2> /dev/null
 
 # Key bindings
-source "/$HOME/.fzf/shell/key-bindings.bash"
+source "$HOME/.fzf/shell/key-bindings.bash"
 
 # Use fd if available
 if hash fd 2>/dev/null; then
