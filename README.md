@@ -1,35 +1,31 @@
-My bash files
-------
+# My bash files
 
-These are the files that accompany my
-[Bash-it](https://github.com/Bash-it/bash-it)
-installation.
+These are my bash files. It uses
+[starship](https://starship.rs/)
+to customize the prompt, so you need it in PATH.
 
 This repo will work better with
 [my dotfiles](https://github.com/giggio/dotfiles).
 
-Installation
-------
+## Installation
 
-* Install Bash-it
 * Clone this repo to ~/bashscripts:
 ````bash
   git clone --recurse-submodules https://github.com/giggio/bashscripts
 ````
-* Add these 3 lines to the end of your `~/.bashrc` or `~/.bash_profile` (the
-  `.bash_it.sh` should already be there):
+* Add this line to the end of your `~/.bashrc` or `~/.bash_profile`:
 ````bash
-# Load Bash It
-export BASH_IT_CUSTOM="$HOME/bashscripts/"
-source "$BASH_IT"/bash_it.sh
+source $HOME/bashscripts/.bashrc
 ````
 
-Author
-------
+## Extending these scripts
 
+It will run every file with `.bash` at the end, so all you need to do is add
+more files. Files are sorted and directories closer to the root of the repo will
+run first.
+
+## Author
 [Giovanni Bassi](https://github.com/giggio)
 
-License
--------
-
+## License
 Licensed under the Apache License, Version 2.0.

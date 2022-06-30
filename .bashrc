@@ -6,6 +6,9 @@ case $- in
       *) return;;
 esac
 
+# Don't check mail when opening terminal.
+unset MAILCHECK
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -95,3 +98,7 @@ else
   echo "Install Starship to get a nice theme. Go to: https://starship.rs/"
 fi
 
+SCRIPTS=`find $THIS_DIR -name '*.bash' -type f -printf '%h\0%d\0%p\n' | sort -t '\0' -n | awk -F'\0' '{print $3}'`
+for SCRIPT in $SCRIPTS; do
+  source $SCRIPT
+done
