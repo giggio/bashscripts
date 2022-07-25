@@ -60,9 +60,6 @@ if hash dvm 2>/dev/null || [ -x DENO_INSTALL/deno ]; then
   fi
   export PATH=$DENO_INSTALL:$PATH
 fi
-if [ -d  /usr/local/go/bin ]; then
-  export PATH=$PATH:/usr/local/go/bin
-fi
 if [ -d  $HOME/.dotnet/tools ]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
