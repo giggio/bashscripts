@@ -5,8 +5,14 @@
 # resolve `winhost` as windows ip, see issue and comment: https://github.com/microsoft/WSL/issues/4619#issuecomment-821142078
 # and https://github.com/microsoft/WSL/issues/4619#issuecomment-966435432
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export winhost=$(cat /etc/resolv.conf | grep nameserver | awk '{ print $2 }')
+# return if this script was sourced
+if (return 0 2>/dev/null); then
+  return 0
+fi
+
+# update winhost:
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 old_winhost=$(grep -P "[[:space:]]winhost" /etc/hosts | awk '{ print $1 }')
 if [ -z $old_winhost ]; then
   if [ `id -u` == "0" ]; then
@@ -29,7 +35,7 @@ elif [ $old_winhost != $winhost ]; then
 fi
 
 # sets owner to root, as this might run as root
-THIS_FILE=$DIR/winhost-set.sh
+THIS_FILE=$DIR/`basename "$0"`
 if [ `ls -ld $THIS_FILE | awk '{print $3 ":" $4}'` != "root:root" ]; then
   if [ `id -u` == "0" ]; then
     chown root:root $THIS_FILE

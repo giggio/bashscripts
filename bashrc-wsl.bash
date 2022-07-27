@@ -43,12 +43,7 @@ if [ "$WSLVersion" == "1" ]; then
     fi
   fi
 fi
-# start cron, add '%sudo ALL=NOPASSWD: /etc/init.d/cron start' via visudo if this fails
-if ! pgrep cron > /dev/null; then
-  if [ -f /etc/init.d/cron ]; then
-    sudo /etc/init.d/cron start > /dev/null
-  fi
-fi
+
 if hash cmd.exe 2> /dev/null; then
   pushd /mnt/c > /dev/null
   export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
@@ -94,6 +89,8 @@ if hash wslview 2>/dev/null; then
   export BROWSER=`which wslview`
 fi
 
-# resolve `winhost` as windows ip, see issue and comment: https://github.com/microsoft/WSL/issues/4619#issuecomment-821142078
-# and https://github.com/microsoft/WSL/issues/4619#issuecomment-966435432
+# resolve `winhost` as windows ip:
 source $DIR/winhost-set.sh
+
+# setup boot commands for wsl:
+$DIR/wsl-boot.sh
