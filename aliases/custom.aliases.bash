@@ -74,3 +74,7 @@ fi
 alias cd-='cd -'
 alias cd..='cd ..'
 alias weather='curl -s wttr.in'
+
+if ! hash bat 2>/dev/null; then
+  alias bat=batcat
+fi
