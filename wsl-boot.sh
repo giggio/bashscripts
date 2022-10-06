@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # this file will be added to the [boot] "command" option (Windows 11) when it first runs.
-# See https://docs.microsoft.com/en-us/windows/wsl/wsl-config#boot
+# See https://learn.microsoft.com/en-us/windows/wsl/wsl-config#boot-settings
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 THIS_FILE=$DIR/`basename "$0"`

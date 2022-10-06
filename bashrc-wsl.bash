@@ -92,5 +92,20 @@ fi
 # resolve `winhost` as windows ip:
 source $DIR/winhost-set.sh
 
+# gpg relay to Windows
+# see https://github.com/Lexicality/wsl-relay/blob/main/scripts/gpg-relay
+# wsl-relay.exe should be in PATH on the Windows file system
+# related:
+# * https://blog.nimamoh.net/yubi-key-gpg-wsl2/
+# * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
+# This allows for `gpg --card-status` to work
+if ! ps aux | grep [w]sl-relay &> /dev/null; then
+  if hash wsl-relay.exe 2>/dev/null; then
+    rm -f $HOME/.gnupg/S.gpg-agent
+    socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+    disown
+  fi
+fi
+
 # setup boot commands for wsl:
 $DIR/wsl-boot.sh
