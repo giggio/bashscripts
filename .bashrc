@@ -97,12 +97,11 @@ else
 fi
 
 # setup ssh-agent
-if [ ! -S $HOME/.ssh/socket ] || [ ! -e $HOME/.ssh/socket ]; then
-  eval `ssh-agent -s` > /dev/null
-  ln -sf "$SSH_AUTH_SOCK" $HOME/.ssh/socket
+if [ ! -S /tmp/ssh_agent_socket ]; then
+  eval `ssh-agent -s -a /tmp/ssh_agent_socket` > /dev/null
   echo $SSH_AGENT_PID > $HOME/.ssh/ssh_pid
 else
-  export SSH_AUTH_SOCK=$HOME/.ssh/socket
+  export SSH_AUTH_SOCK=/tmp/ssh_agent_socket
   export SSH_AGENT_PID=`cat $HOME/.ssh/ssh_pid`
 fi
 
