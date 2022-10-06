@@ -96,6 +96,16 @@ else
   PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] '
 fi
 
+# setup ssh-agent
+if [ ! -S $HOME/.ssh/socket ] || [ ! -e $HOME/.ssh/socket ]; then
+  eval `ssh-agent -s` > /dev/null
+  ln -sf "$SSH_AUTH_SOCK" $HOME/.ssh/socket
+  echo $SSH_AGENT_PID > $HOME/.ssh/ssh_pid
+else
+  export SSH_AUTH_SOCK=$HOME/.ssh/socket
+  export SSH_AGENT_PID=`cat $HOME/.ssh/ssh_pid`
+fi
+
 SCRIPTS=`find $THIS_DIR -name '*.bash' -type f -printf '%h\0%d\0%p\n' | sort -t '\0' -n | awk -F'\0' '{print $3}'`
 for SCRIPT in $SCRIPTS; do
   source $SCRIPT
