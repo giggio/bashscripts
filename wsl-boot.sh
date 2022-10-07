@@ -16,7 +16,7 @@ isSetup=$(python3 << EOF
 import configparser
 config = configparser.ConfigParser(allow_no_value=True)
 config.read('$WSL_CONF')
-print(config.has_option('boot', 'command'))
+print(config.has_option('boot', 'command') and config.has_option('automount', 'options'))
 EOF
 )
 
@@ -44,6 +44,11 @@ if not config.has_section('boot'):
   config.add_section('boot')
 if not config.has_option('boot', 'command') or config['boot']['command'] != '$THIS_FILE':
   config['boot']['command'] = '$THIS_FILE'
+  config.write(open('$WSL_CONF', 'w'))
+if not config.has_section('automount'):
+  config.add_section('automount')
+if not config.has_option('automount', 'options') or config['automount']['options'] != '"metadata,umask=22,fmask=11"':
+  config['automount']['options'] = '"metadata,umask=22,fmask=11"'
   config.write(open('$WSL_CONF', 'w'))
 EOF
 
