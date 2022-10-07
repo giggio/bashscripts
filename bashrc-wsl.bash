@@ -99,11 +99,48 @@ source $DIR/winhost-set.sh
 # * https://blog.nimamoh.net/yubi-key-gpg-wsl2/
 # * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
 # This allows for `gpg --card-status` to work
+# see https://github.com/giggio/wsl-ssh-pageant-installer to view how to configure the relay to autostart
+# see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
 if ! ps aux | grep [w]sl-relay &> /dev/null; then
+  rm -f $HOME/.gnupg/S.gpg-agent
   if hash wsl-relay.exe 2>/dev/null; then
-    rm -f $HOME/.gnupg/S.gpg-agent
-    socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
-    disown
+    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (Test-Path $env:LOCALAPPDATA/gnupg/S.gpg-agent).ToString().ToLower()'`; then
+      socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+      disown
+    fi
+  fi
+fi
+
+# ssh relay through gpg to Windows
+# needs to run `wsl-ssh-pageant --winssh ssh-pageant --systray`
+# see https://github.com/benpye/wsl-ssh-pageant
+# related:
+# * https://gist.github.com/matusnovak/302c7b003043849337f94518a71df777
+if ! ps aux | grep [n]piperelay &> /dev/null; then
+  rm -f /tmp/wsl-ssh-pageant.socket
+  if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host ((Get-Process gpg-agent).Length -eq 1).ToString().ToLower()'` \
+    || gpg-connect-agent.exe /bye; then
+      WSL_SSH_PAGEANT_STARTED=false
+      if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (([array]([System.IO.Directory]::GetFiles("//./pipe/") | Where-Object { $_ -eq "//./pipe/ssh-pageant" })).Length -eq 1).ToString().ToLower()'`; then
+        WSL_SSH_PAGEANT_STARTED=true
+      else
+        # start wsl-ssh-pageant.exe
+        if hash wsl-ssh-pageant.exe 2> /dev/null; then
+          wsl-ssh-pageant.exe --winssh ssh-pageant --systray &> /dev/null &
+          if kill -0 $! &> /dev/null; then
+            WSL_SSH_PAGEANT_STARTED=true
+          else
+            echo "Could not start WSL SSH Pageant"
+          fi
+        fi
+      fi
+      if $WSL_SSH_PAGEANT_STARTED; then
+        socat UNIX-LISTEN:/tmp/wsl_ssh_pageant_socket,unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/ssh-pageant' &
+        disown
+        export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
+      fi
+    fi
   fi
 fi
 
