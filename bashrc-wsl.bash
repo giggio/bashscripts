@@ -116,7 +116,9 @@ fi
 # see https://github.com/benpye/wsl-ssh-pageant
 # related:
 # * https://gist.github.com/matusnovak/302c7b003043849337f94518a71df777
-if ! ps aux | grep [n]piperelay &> /dev/null; then
+if ps aux | grep [n]piperelay &> /dev/null; then
+  export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
+else
   rm -f /tmp/wsl-ssh-pageant.socket
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
     if `powershell.exe -noprofile -NonInteractive -c 'Write-Host ((Get-Process gpg-agent).Length -eq 1).ToString().ToLower()'` \
