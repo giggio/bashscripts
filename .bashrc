@@ -104,11 +104,13 @@ done
 # setup ssh-agent
 # only setup ssh agent if not previosly set
 if [ -z "$SSH_AUTH_SOCK" ]; then
-  if [ ! -S /tmp/ssh_agent_socket ]; then
+  if [ -S /tmp/ssh_agent_socket ]; then
+    export SSH_AUTH_SOCK=/tmp/ssh_agent_socket
+    if [ -f $HOME/.ssh/ssh_pid ]; then
+      export SSH_AGENT_PID=`cat $HOME/.ssh/ssh_pid`
+    fi
+  else
     eval `ssh-agent -s -a /tmp/ssh_agent_socket` > /dev/null
     echo $SSH_AGENT_PID > $HOME/.ssh/ssh_pid
-  else
-    export SSH_AUTH_SOCK=/tmp/ssh_agent_socket
-    export SSH_AGENT_PID=`cat $HOME/.ssh/ssh_pid`
   fi
 fi
