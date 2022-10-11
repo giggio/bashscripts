@@ -33,3 +33,16 @@ function edit-var {
   eval "${!VAR}"'=`cat '$TMP'`'
   rm $TMP
 }
+
+function lorem  {
+  if [ -z "$1" ]; then
+    PARAGRAPHS=10
+  else
+    if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+      echo "Usage: lorem <number of paragraphs>"
+      return
+    fi
+    PARAGRAPHS=$1
+  fi
+  perl -e 'use Text::Lorem;my $text = Text::Lorem->new();$paragraphs = $text->paragraphs('$PARAGRAPHS');print $paragraphs;'
+}
