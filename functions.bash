@@ -34,7 +34,7 @@ function edit-var {
   rm $TMP
 }
 
-function lorem  {
+function lorem {
   if [ -z "$1" ]; then
     PARAGRAPHS=10
   else
@@ -45,4 +45,10 @@ function lorem  {
     PARAGRAPHS=$1
   fi
   perl -e 'use Text::Lorem;my $text = Text::Lorem->new();$paragraphs = $text->paragraphs('$PARAGRAPHS');print $paragraphs;'
+}
+
+function watchrun {
+  while inotifywait -q -e close_write $1; do
+    `realpath $1`
+  done
 }
