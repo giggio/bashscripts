@@ -117,7 +117,7 @@ if ps aux | grep [n]piperelay &> /dev/null; then
 else
   rm -f /tmp/wsl-ssh-pageant.socket
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
-    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host ((Get-Process gpg-agent).Length -eq 1).ToString().ToLower()'` \
+    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host ((Get-Process gpg-agent -ErrorAction SilentlyContinue).Length -eq 1).ToString().ToLower()'` \
     || gpg-connect-agent.exe /bye; then
       WSL_SSH_PAGEANT_STARTED=false
       if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (([array]([System.IO.Directory]::GetFiles("//./pipe/") | Where-Object { $_ -eq "//./pipe/ssh-pageant" })).Length -eq 1).ToString().ToLower()'`; then
