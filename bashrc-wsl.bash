@@ -97,11 +97,20 @@ source $DIR/winhost-set.sh
 # This allows for `gpg --card-status` to work
 # see https://github.com/giggio/wsl-ssh-pageant-installer to view how to configure the relay to autostart
 # see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
-if ! ps aux | grep [w]sl-relay &> /dev/null; then
+if ! ps x | grep '[w]sl-relay.*--gpg,' &> /dev/null; then
   rm -f $HOME/.gnupg/S.gpg-agent
   if hash wsl-relay.exe 2>/dev/null; then
     if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (Test-Path $env:LOCALAPPDATA/gnupg/S.gpg-agent).ToString().ToLower()'`; then
       socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+      disown
+    fi
+  fi
+fi
+if ! ps x | grep '[w]sl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
+  rm -f $HOME/.gnupg/S.gpg-agent.extra
+  if hash wsl-relay.exe 2>/dev/null; then
+    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (Test-Path $env:LOCALAPPDATA/gnupg/S.gpg-agent.extra).ToString().ToLower()'`; then
+      socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent.extra,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
       disown
     fi
   fi
