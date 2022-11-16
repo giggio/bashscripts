@@ -138,33 +138,37 @@ fi
 # see https://github.com/benpye/wsl-ssh-pageant
 # related:
 # * https://gist.github.com/matusnovak/302c7b003043849337f94518a71df777
+ensure_wsl_ssh_pageant() {
+  if cmd.exe /c 'dir \\.\pipe\\ssh-pageant' &> /dev/null; then
+    return 0
+  else
+    # start wsl-ssh-pageant.exe
+    local WSL_SSH_PAGEANT=''
+    if hash wsl-ssh-pageant-gui.exe 2> /dev/null; then
+      WSL_SSH_PAGEANT=wsl-ssh-pageant-gui.exe
+    elif hash wsl-ssh-pageant.exe 2> /dev/null; then
+      WSL_SSH_PAGEANT=wsl-ssh-pageant.exe
+    fi
+    if [ "$WSL_SSH_PAGEANT" != '' ]; then
+      $WSL_SSH_PAGEANT --winssh ssh-pageant --systray &> /dev/null &
+      if kill -0 $! &> /dev/null; then
+        return 0
+      else
+        echo "Could not start WSL SSH Pageant"
+      fi
+    fi
+  fi
+  return 1
+}
 if pgrep --full npiperelay &> /dev/null; then
-  export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
+  if ensure_wsl_ssh_pageant; then
+    export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
+  fi
 else
   rm -f /tmp/wsl-ssh-pageant.socket
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
     if gpg_agent_running; then
-      WSL_SSH_PAGEANT_STARTED=false
-      if cmd.exe /c 'dir \\.\pipe\\ssh-pageant' &> /dev/null; then
-        WSL_SSH_PAGEANT_STARTED=true
-      else
-        # start wsl-ssh-pageant.exe
-        WSL_SSH_PAGEANT=''
-        if hash wsl-ssh-pageant-gui.exe 2> /dev/null; then
-          WSL_SSH_PAGEANT=wsl-ssh-pageant-gui.exe
-        elif hash wsl-ssh-pageant.exe 2> /dev/null; then
-          WSL_SSH_PAGEANT=wsl-ssh-pageant.exe
-        fi
-        if [ "$WSL_SSH_PAGEANT" != '' ]; then
-          $WSL_SSH_PAGEANT --winssh ssh-pageant --systray &> /dev/null &
-          if kill -0 $! &> /dev/null; then
-            WSL_SSH_PAGEANT_STARTED=true
-          else
-            echo "Could not start WSL SSH Pageant"
-          fi
-        fi
-      fi
-      if $WSL_SSH_PAGEANT_STARTED; then
+      if ensure_wsl_ssh_pageant; then
         socat UNIX-LISTEN:/tmp/wsl_ssh_pageant_socket,unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/ssh-pageant' &
         disown
         export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
