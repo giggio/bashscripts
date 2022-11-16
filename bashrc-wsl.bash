@@ -1,15 +1,18 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if grep [Mm]icrosoft /proc/version > /dev/null; then
+if grep '[Mm]icrosoft' /proc/version > /dev/null; then
   export WSL=true
 else
   export WSL=false
 fi
 function removeWindowsFromPath {
   if ! $WSL; then
-    echo $PATH
+    echo "$PATH"
     return
   fi
-  echo `echo $PATH | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'`
+  echo "$PATH" | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'
+}
+function windows_env_var() {
+  wslpath "$(cmd.exe /c 'echo|set /p=%'"$1"'%' 2> /dev/null)"
 }
 if [ -f /.dockerenv ] || grep docker /proc/1/cgroup -qa 2> /dev/null; then
   export RUNNING_IN_CONTAINER=true
@@ -26,6 +29,7 @@ else
     sshd|*/sshd) IS_SSH=true;;
   esac
 fi
+export IS_SSH
 if [ -v WSL_INTEROP ] || [ -v WSL_INTEGRATION_CACHE ]; then
   export WSLVersion=2
 else
@@ -42,10 +46,11 @@ fi
 
 if hash cmd.exe 2> /dev/null; then
   pushd /mnt/c > /dev/null
-  export WHOME=$(wslpath -u $(cmd.exe /c "echo %USERPROFILE%") | sed -e 's/[[:space:]]*$//')
+  # shellcheck disable=SC2155
+  export WHOME=`windows_env_var USERPROFILE`
   popd > /dev/null
   if [ "$WHOME" == "$(pwd)" ]; then
-    cd
+    cd || exit
   fi
 fi
 
@@ -54,7 +59,8 @@ fi
 #   wslfetch
 # fi
 
-export WINDOWS_IP_ADDRESS=`ipconfig.exe | grep WSL -A3 | tail -n 1 | awk '{print $NF}' | tr -d '\r\n'`
+WINDOWS_IP_ADDRESS=`ipconfig.exe | grep WSL -A3 | tail -n 1 | awk '{print $NF}' | tr -d '\r\n'`
+export WINDOWS_IP_ADDRESS
 
 # start proxy to Windows. Necessary until https://github.com/microsoft/WSL/issues/4517#issuecomment-621832142
 # is fixed. See comment for details.
@@ -76,17 +82,23 @@ function setMTU {
 }
 
 # TODO: remove when https://github.com/dotnet/aspnetcore/issues/7246 is fixed
-if [ -f $HOME/certs/dotnet.pfx ]; then
+if [ -f "$HOME"/certs/dotnet.pfx ]; then
   export Kestrel__Certificates__Default__Path=$HOME/certs/dotnet.pfx
   export Kestrel__Certificates__Default__Password=''
 fi
 
 if hash wslview 2>/dev/null; then
-  export BROWSER=`which wslview`
+  BROWSER=`which wslview`
+  export BROWSER
 fi
 
 # resolve `winhost` as windows ip:
-source $DIR/winhost-set.sh
+source "$DIR"/winhost-set.sh
+
+gpg_agent_running() {
+    powershell.exe -noprofile -NonInteractive -c 'Get-Process gpg-agent -ErrorAction SilentlyContinue | Out-Null' \
+    || gpg-connect-agent.exe /bye
+}
 
 # gpg relay to Windows
 # see https://github.com/Lexicality/wsl-relay/blob/main/scripts/gpg-relay
@@ -97,21 +109,26 @@ source $DIR/winhost-set.sh
 # This allows for `gpg --card-status` to work
 # see https://github.com/giggio/wsl-ssh-pageant-installer to view how to configure the relay to autostart
 # see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
-if ! ps x | grep '[w]sl-relay.*--gpg,' &> /dev/null; then
-  rm -f $HOME/.gnupg/S.gpg-agent
-  if hash wsl-relay.exe 2>/dev/null; then
-    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (Test-Path $env:LOCALAPPDATA/gnupg/S.gpg-agent).ToString().ToLower()'`; then
-      socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
-      disown
+LOCALAPPDATA=`windows_env_var LOCALAPPDATA`
+if ! pgrep --full 'wsl-relay.*--gpg,' &> /dev/null; then
+  rm -f "$HOME"/.gnupg/S.gpg-agent
+  if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    if gpg_agent_running; then
+      if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent" ]; then
+        socat UNIX-LISTEN:"$HOME"/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+        disown
+      fi
     fi
   fi
 fi
-if ! ps x | grep '[w]sl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
-  rm -f $HOME/.gnupg/S.gpg-agent.extra
-  if hash wsl-relay.exe 2>/dev/null; then
-    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (Test-Path $env:LOCALAPPDATA/gnupg/S.gpg-agent.extra).ToString().ToLower()'`; then
-      socat UNIX-LISTEN:$HOME/.gnupg/S.gpg-agent.extra,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
-      disown
+if ! pgrep --full 'wsl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
+  rm -f "$HOME"/.gnupg/S.gpg-agent.extra
+  if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    if gpg_agent_running; then
+      if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent.extra" ]; then
+        socat UNIX-LISTEN:"$HOME"/.gnupg/S.gpg-agent.extra,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
+        disown
+      fi
     fi
   fi
 fi
@@ -121,20 +138,25 @@ fi
 # see https://github.com/benpye/wsl-ssh-pageant
 # related:
 # * https://gist.github.com/matusnovak/302c7b003043849337f94518a71df777
-if ps aux | grep [n]piperelay &> /dev/null; then
+if pgrep --full npiperelay &> /dev/null; then
   export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
 else
   rm -f /tmp/wsl-ssh-pageant.socket
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
-    if `powershell.exe -noprofile -NonInteractive -c 'Write-Host ((Get-Process gpg-agent -ErrorAction SilentlyContinue).Length -eq 1).ToString().ToLower()'` \
-    || gpg-connect-agent.exe /bye; then
+    if gpg_agent_running; then
       WSL_SSH_PAGEANT_STARTED=false
-      if `powershell.exe -noprofile -NonInteractive -c 'Write-Host (([array]([System.IO.Directory]::GetFiles("//./pipe/") | Where-Object { $_ -eq "//./pipe/ssh-pageant" })).Length -eq 1).ToString().ToLower()'`; then
+      if cmd.exe /c 'dir \\.\pipe\\ssh-pageant' &> /dev/null; then
         WSL_SSH_PAGEANT_STARTED=true
       else
         # start wsl-ssh-pageant.exe
-        if hash wsl-ssh-pageant.exe 2> /dev/null; then
-          wsl-ssh-pageant.exe --winssh ssh-pageant --systray &> /dev/null &
+        WSL_SSH_PAGEANT=''
+        if hash wsl-ssh-pageant-gui.exe 2> /dev/null; then
+          WSL_SSH_PAGEANT=wsl-ssh-pageant-gui.exe
+        elif hash wsl-ssh-pageant.exe 2> /dev/null; then
+          WSL_SSH_PAGEANT=wsl-ssh-pageant.exe
+        fi
+        if [ "$WSL_SSH_PAGEANT" != '' ]; then
+          $WSL_SSH_PAGEANT --winssh ssh-pageant --systray &> /dev/null &
           if kill -0 $! &> /dev/null; then
             WSL_SSH_PAGEANT_STARTED=true
           else
@@ -152,4 +174,4 @@ else
 fi
 
 # setup boot commands for wsl:
-$DIR/wsl-boot.sh
+"$DIR"/wsl-boot.sh
