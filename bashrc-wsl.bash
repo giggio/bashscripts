@@ -169,7 +169,7 @@ else
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
     if gpg_agent_running; then
       if ensure_wsl_ssh_pageant; then
-        socat UNIX-LISTEN:/tmp/wsl_ssh_pageant_socket,unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/ssh-pageant' &
+        socat UNIX-LISTEN:/tmp/wsl_ssh_pageant_socket,unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/ssh-pageant',nofork &
         disown
         export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
       fi
