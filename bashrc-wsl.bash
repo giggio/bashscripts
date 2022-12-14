@@ -150,12 +150,7 @@ ensure_wsl_ssh_pageant() {
       WSL_SSH_PAGEANT=wsl-ssh-pageant.exe
     fi
     if [ "$WSL_SSH_PAGEANT" != '' ]; then
-      $WSL_SSH_PAGEANT --winssh ssh-pageant --systray &> /dev/null &
-      if kill -0 $! &> /dev/null; then
-        return 0
-      else
-        echo "Could not start WSL SSH Pageant"
-      fi
+      powershell.exe -NoProfile -NoLogo -c 'Start-Process -WindowStyle Hidden -FilePath '$WSL_SSH_PAGEANT' -ArgumentList --winssh,ssh-pageant,--systray'
     fi
   fi
   return 1
