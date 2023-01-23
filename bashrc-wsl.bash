@@ -107,7 +107,6 @@ gpg_agent_running() {
 # * https://blog.nimamoh.net/yubi-key-gpg-wsl2/
 # * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
 # This allows for `gpg --card-status` to work
-# see https://github.com/giggio/wsl-ssh-pageant-installer to view how to configure the relay to autostart
 # see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
 LOCALAPPDATA=`windows_env_var LOCALAPPDATA`
 if ! pgrep --full 'wsl-relay.*--gpg,' &> /dev/null; then
@@ -133,42 +132,36 @@ if ! pgrep --full 'wsl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
   fi
 fi
 
-# ssh relay through gpg to Windows
-# needs to run `wsl-ssh-pageant --winssh ssh-pageant --systray`
-# see https://github.com/benpye/wsl-ssh-pageant
-# related:
-# * https://gist.github.com/matusnovak/302c7b003043849337f94518a71df777
-ensure_wsl_ssh_pageant() {
-  if cmd.exe /c 'dir \\.\pipe\\ssh-pageant' &> /dev/null; then
+ensure_gpg_ssh_agent() {
+  if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &> /dev/null; then
     return 0
   else
-    # start wsl-ssh-pageant.exe
-    local WSL_SSH_PAGEANT=''
-    if hash wsl-ssh-pageant-gui.exe 2> /dev/null; then
-      WSL_SSH_PAGEANT=wsl-ssh-pageant-gui.exe
-    elif hash wsl-ssh-pageant.exe 2> /dev/null; then
-      WSL_SSH_PAGEANT=wsl-ssh-pageant.exe
-    fi
-    if [ "$WSL_SSH_PAGEANT" != '' ]; then
-      powershell.exe -NoProfile -NoLogo -c 'Start-Process -WindowStyle Hidden -FilePath '$WSL_SSH_PAGEANT' -ArgumentList --winssh,ssh-pageant,--systray'
+    # start gpg agent in Windows
+    if gpg_agent_running; then
+      if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &> /dev/null; then
+        return 0
+      fi
     fi
   fi
   return 1
 }
+
+SSH_AUTH_SOCK=/tmp/gpg_ssh_agent_socket
 if pgrep --full npiperelay &> /dev/null; then
-  if ensure_wsl_ssh_pageant; then
-    export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
+  if ensure_gpg_ssh_agent; then
+    export SSH_AUTH_SOCK
   fi
 else
-  rm -f /tmp/wsl-ssh-pageant.socket
   if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
     if gpg_agent_running; then
-      if ensure_wsl_ssh_pageant; then
-        socat UNIX-LISTEN:/tmp/wsl_ssh_pageant_socket,unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/ssh-pageant',nofork &
-        disown
-        export SSH_AUTH_SOCK=/tmp/wsl_ssh_pageant_socket
-      fi
+      socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
+      disown
+      export SSH_AUTH_SOCK
+    else
+      unset SSH_AUTH_SOCK
     fi
+  else
+    unset SSH_AUTH_SOCK
   fi
 fi
 
