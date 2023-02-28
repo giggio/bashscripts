@@ -78,3 +78,7 @@ alias weather='curl -s wttr.in'
 if ! hash bat 2>/dev/null && hash batcat 2>/dev/null; then
   alias bat=batcat
 fi
+
+if hash github-copilot-cli 2>/dev/null; then
+  eval "$(github-copilot-cli alias -- "$0")"
+fi
