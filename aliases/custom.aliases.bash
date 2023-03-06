@@ -1,16 +1,16 @@
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $DIR/../lib/complete-alias/complete_alias
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+  #alias dir='dir --color=auto'
+  #alias vdir='vdir --color=auto'
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
 fi
 
 # some more ls aliases
@@ -52,14 +52,15 @@ fi
 if hash kubectl 2>/dev/null; then
   if [ -f "$DIR"/../lib/kubectl-aliases/.kubectl_aliases ]; then
     source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
-    ALIASES=`awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases`
+    ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
     for ALIAS in $ALIASES; do
       complete -F _complete_alias "$ALIAS"
     done
-    if hash bat 2>/dev/null || hash batcat 2>/dev/null; then
-      UPDATED_ALIASES=`alias | grep --color=never 'k.*oyaml' | sed 's/'"'"'$/'" | bat --language yaml'/"`
-      source <(echo "$UPDATED_ALIASES")
-    fi
+    # did not work, we lost completions for these aliases because of the pipe
+    #if hash bat 2>/dev/null || hash batcat 2>/dev/null; then
+    #  UPDATED_ALIASES=`alias | grep --color=never 'k.*oyaml' | sed 's/'"'"'$/'" | bat --language yaml'/"`
+    #  source <(echo "$UPDATED_ALIASES")
+    #fi
   else
     alias k=kubectl
     complete -F _complete_alias k
