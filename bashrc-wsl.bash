@@ -151,7 +151,7 @@ ensure_gpg_ssh_agent() {
 }
 
 forward_ssh() {
-  local SSH_AUTH_SOCK=/tmp/gpg_ssh_agent_socket
+  local SSH_AUTH_SOCK=/tmp/ssh_agent_socket
   if pgrep --full npiperelay &> /dev/null; then
     if ensure_gpg_ssh_agent; then
       export SSH_AUTH_SOCK
