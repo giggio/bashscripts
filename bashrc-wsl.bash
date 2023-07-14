@@ -100,37 +100,41 @@ gpg_agent_running() {
     || gpg-connect-agent.exe /bye
 }
 
-# gpg relay to Windows
-# see https://github.com/Lexicality/wsl-relay/blob/main/scripts/gpg-relay
-# wsl-relay.exe should be in PATH on the Windows file system
-# related:
-# * https://blog.nimamoh.net/yubi-key-gpg-wsl2/
-# * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
-# This allows for `gpg --card-status` to work
-# see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
-LOCALAPPDATA=`windows_env_var LOCALAPPDATA`
-if ! pgrep --full 'wsl-relay.*--gpg,' &> /dev/null; then
-  rm -f "$HOME"/.gnupg/S.gpg-agent
-  if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
-    if gpg_agent_running; then
-      if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent" ]; then
-        socat UNIX-LISTEN:"$HOME"/.gnupg/S.gpg-agent,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
-        disown
+forward_gpg() {
+  # gpg relay to Windows
+  # see https://github.com/Lexicality/wsl-relay/blob/main/scripts/gpg-relay
+  # wsl-relay.exe should be in PATH on the Windows file system
+  # related:
+  # * https://blog.nimamoh.net/yubi-key-gpg-wsl2/
+  # * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
+  # This allows for `gpg --card-status` to work
+  # see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
+  LOCALAPPDATA=`windows_env_var LOCALAPPDATA`
+  if ! pgrep --full 'wsl-relay.*--gpg,' &> /dev/null; then
+    AGENT_SOCKET_FILE=`gpgconf --list-dir | grep --color=never agent-socket | cut -d: -f2`
+    rm -f "$AGENT_SOCKET_FILE"
+    if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+      if gpg_agent_running; then
+        if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent" ]; then
+          socat UNIX-LISTEN:"$AGENT_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+          disown
+        fi
       fi
     fi
   fi
-fi
-if ! pgrep --full 'wsl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
-  rm -f "$HOME"/.gnupg/S.gpg-agent.extra
-  if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
-    if gpg_agent_running; then
-      if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent.extra" ]; then
-        socat UNIX-LISTEN:"$HOME"/.gnupg/S.gpg-agent.extra,fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
-        disown
+  if ! pgrep --full 'wsl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
+    AGENT_EXTRA_SOCKET_FILE=`gpgconf --list-dir | grep --color=never agent-extra-socket | cut -d: -f2`
+    rm -f "$AGENT_EXTRA_SOCKET_FILE"
+    if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+      if gpg_agent_running; then
+        if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent.extra" ]; then
+          socat UNIX-LISTEN:"$AGENT_EXTRA_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
+          disown
+        fi
       fi
     fi
   fi
-fi
+}
 
 ensure_gpg_ssh_agent() {
   if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &> /dev/null; then
@@ -146,24 +150,26 @@ ensure_gpg_ssh_agent() {
   return 1
 }
 
-SSH_AUTH_SOCK=/tmp/gpg_ssh_agent_socket
-if pgrep --full npiperelay &> /dev/null; then
-  if ensure_gpg_ssh_agent; then
-    export SSH_AUTH_SOCK
-  fi
-else
-  if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
-    if gpg_agent_running; then
-      socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
-      disown
+forward_ssh() {
+  local SSH_AUTH_SOCK=/tmp/gpg_ssh_agent_socket
+  if pgrep --full npiperelay &> /dev/null; then
+    if ensure_gpg_ssh_agent; then
       export SSH_AUTH_SOCK
-    else
-      unset SSH_AUTH_SOCK
     fi
   else
-    unset SSH_AUTH_SOCK
+    if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+      if gpg_agent_running; then
+        socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
+        disown
+        export SSH_AUTH_SOCK
+      fi
+    fi
   fi
-fi
+}
+
+forward_gpg
+
+forward_ssh
 
 # setup boot commands for wsl:
 "$DIR"/wsl-boot.sh
