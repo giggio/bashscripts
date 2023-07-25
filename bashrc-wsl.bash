@@ -116,8 +116,7 @@ forward_gpg() {
     if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
         if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent" ]; then
-          socat UNIX-LISTEN:"$AGENT_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
-          disown
+          SCREENDIR=$HOME/.screen screen -dmS gpg-agent socat UNIX-LISTEN:"$AGENT_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
         fi
       fi
     fi
@@ -128,8 +127,7 @@ forward_gpg() {
     if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
         if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent.extra" ]; then
-          socat UNIX-LISTEN:"$AGENT_EXTRA_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
-          disown
+          SCREENDIR=$HOME/.screen screen -dmS gpg-agent-extra socat UNIX-LISTEN:"$AGENT_EXTRA_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
         fi
       fi
     fi
@@ -137,12 +135,12 @@ forward_gpg() {
 }
 
 ensure_gpg_ssh_agent() {
-  if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &> /dev/null; then
+  if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
     return 0
   else
     # start gpg agent in Windows
     if gpg_agent_running; then
-      if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &> /dev/null; then
+      if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
         return 0
       fi
     fi
@@ -152,15 +150,14 @@ ensure_gpg_ssh_agent() {
 
 forward_ssh() {
   local SSH_AUTH_SOCK=/tmp/ssh_agent_socket
-  if pgrep --full npiperelay &> /dev/null; then
+  if pgrep --full npiperelay &>/dev/null; then
     if ensure_gpg_ssh_agent; then
       export SSH_AUTH_SOCK
     fi
   else
     if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
-        socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
-        disown
+        SCREENDIR=$HOME/.screen screen -dmS ssh_auth_sock socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,group=giggio,mode=775,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
         export SSH_AUTH_SOCK
       fi
     fi
