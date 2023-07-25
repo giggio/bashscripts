@@ -11,7 +11,7 @@ fi
 
 function addCompletion {
   if [ -f $1 ]; then
-      source $1
+    source $1
   fi
 }
 
@@ -19,10 +19,7 @@ updateCompletionsCommands=''
 export COMPLETIONS_DIR=$HOME/.completions
 function updateCompletions {
   echo Updating completions...
-  mkdir -p $COMPLETIONS_DIR
-  echo -e $updateCompletionsCommands | while read line; do bash -c "$line"; done
-  for file in `echo $COMPLETIONS_DIR`; do
-    chmod +x $file
-  done
+  mkdir -p "$COMPLETIONS_DIR"
+  echo -e "$updateCompletionsCommands" | while read -r line; do bash -c "$line"; done
   echo Done.
 }
