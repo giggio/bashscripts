@@ -14,8 +14,8 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # some more ls aliases
-if hash exa 2>/dev/null; then
-  alias ll='exa --long --group --all --all --group-directories-first'
+if hash eza 2>/dev/null; then
+  alias ll='eza --long --group --all --all --group-directories-first'
 else
   alias ll='ls -alF'
 fi
