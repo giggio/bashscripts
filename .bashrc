@@ -52,14 +52,14 @@ if [ -d $N_PREFIX ]; then
   export PATH=$N_PREFIX/bin:$PATH
   export N_PREFIX
 fi
-export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
 DENO_INSTALL=$HOME/.deno/bin
-if hash dvm 2>/dev/null || [ -x DENO_INSTALL/deno ]; then
-  if ! [ -d $DENO_INSTALL ]; then
-    mkdir -p $DENO_INSTALL
+if hash dvm 2>/dev/null || [ -x "$DENO_INSTALL"/deno ]; then
+  if ! [ -d "$DENO_INSTALL" ]; then
+    mkdir -p "$DENO_INSTALL"
   fi
   export PATH=$DENO_INSTALL:$PATH
 fi
+unset DENO_INSTALL
 if [ -d  $HOME/.dotnet/tools ]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
