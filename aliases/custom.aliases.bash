@@ -51,16 +51,17 @@ if hash hub 2>/dev/null; then
 fi
 if hash kubectl 2>/dev/null; then
   if [ -f "$DIR"/../lib/kubectl-aliases/.kubectl_aliases ]; then
-    source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
-    ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
+    if hash kubecolor 2>/dev/null; then
+      ALIASES_FULL="`sed "s/='kubectl/='kubecolor/" "$DIR"/../lib/kubectl-aliases/.kubectl_aliases`"
+      eval "$ALIASES_FULL"
+      ALIASES=$(echo "$ALIASES_FULL" | awk -F'[ =]' '/^alias / {print $2}')
+    else
+      source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
+      ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
+    fi
     for ALIAS in $ALIASES; do
       complete -F _complete_alias "$ALIAS"
     done
-    # did not work, we lost completions for these aliases because of the pipe
-    #if hash bat 2>/dev/null || hash batcat 2>/dev/null; then
-    #  UPDATED_ALIASES=`alias | grep --color=never 'k.*oyaml' | sed 's/'"'"'$/'" | bat --language yaml'/"`
-    #  source <(echo "$UPDATED_ALIASES")
-    #fi
   else
     alias k=kubectl
     complete -F _complete_alias k
