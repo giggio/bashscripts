@@ -52,16 +52,16 @@ fi
 if hash kubectl 2>/dev/null; then
   if [ -f "$DIR"/../lib/kubectl-aliases/.kubectl_aliases ]; then
     if hash kubecolor 2>/dev/null; then
-      ALIASES_FULL="`sed "s/='kubectl/='kubecolor/" "$DIR"/../lib/kubectl-aliases/.kubectl_aliases`"
-      eval "$ALIASES_FULL"
-      ALIASES=$(echo "$ALIASES_FULL" | awk -F'[ =]' '/^alias / {print $2}')
+      source "$DIR"/../lib/kubectl-aliases/.kubecolor_aliases
     else
       source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
-      ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
     fi
+    ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
     for ALIAS in $ALIASES; do
       complete -F _complete_alias "$ALIAS"
     done
+    unset ALIASES
+    unset ALIAS
   else
     alias k=kubectl
     complete -F _complete_alias k
