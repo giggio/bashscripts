@@ -60,7 +60,7 @@ if hash dvm 2>/dev/null || [ -x "$DENO_INSTALL"/deno ]; then
   export PATH=$DENO_INSTALL:$PATH
 fi
 unset DENO_INSTALL
-if [ -d  $HOME/.dotnet/tools ]; then
+if [ -d  "$HOME"/.dotnet/tools ] && ! [[ $PATH =~ "$HOME"/.dotnet/tools ]]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
 if [ -f $HOME/.cargo/env ]; then
