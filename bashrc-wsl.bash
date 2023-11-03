@@ -14,7 +14,26 @@ function removeWindowsFromPath {
   echo "$PATH" | tr ':' '\n' | grep -v /mnt/ | tr '\n' ':'
 }
 function windows_env_var() {
-  wslpath "$(cmd.exe /c 'echo|set /p=%'"$1"'%' 2> /dev/null)"
+  pushd /mnt/c > /dev/null
+  wslpath "$(/mnt/c/Windows/System32/cmd.exe /c 'echo|set /p=%'"$1"'%' 2> /dev/null)"
+  popd > /dev/null
+}
+function find_in_win_path () {
+  if ! [ -v 1 ]; then return 1; fi
+  binary=$1
+  cd /mnt/c
+  path=`/mnt/c/Windows/System32/cmd.exe /c "where.exe $binary 2> NUL" | head -n1 | awk '{gsub(/\r$/,"")} {print $0}'`
+  if [ "$path" != '' ]; then
+    wslpath "$path"
+  fi
+}
+function run_in_win_path () {
+  if ! [ -v 1 ]; then return 1; fi
+  binary=$1
+  shift
+  path=`find_in_win_path "$binary"`
+  if [ "$path" == '' ]; then return 1; fi
+  "$path" "$@"
 }
 if [ -f /.dockerenv ] || grep docker /proc/1/cgroup -qa 2> /dev/null; then
   export RUNNING_IN_CONTAINER=true
@@ -23,6 +42,8 @@ else
 fi
 if ! $WSL || $RUNNING_IN_CONTAINER; then return; fi
 # put your script here for WSL only
+# shellcheck disable=SC2155
+export PATH=`removeWindowsFromPath`
 IS_SSH=false
 if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
   IS_SSH=true
@@ -46,34 +67,27 @@ if [ "$WSLVersion" == "1" ]; then
   fi
 fi
 
-if hash cmd.exe 2> /dev/null; then
-  pushd /mnt/c > /dev/null
-  # shellcheck disable=SC2155
-  export WHOME=`windows_env_var USERPROFILE`
-  popd > /dev/null
-  if [ "$WHOME" == "$(pwd)" ]; then
-    cd || exit
-  fi
-fi
+# shellcheck disable=SC2155
+export WHOME=`windows_env_var USERPROFILE`
 
 # Do not run wslfetch, it is really slow to start, it adds several seconds to bash's startup.
 # if hash wslfetch 2>/dev/null; then
 #   wslfetch
 # fi
 
-WINDOWS_IP_ADDRESS=`ipconfig.exe | grep WSL -A3 | tail -n 1 | awk '{print $NF}' | tr -d '\r\n'`
+WINDOWS_IP_ADDRESS=$(run_in_win_path ipconfig.exe | grep WSL -A5 | grep IPv4 | tail -n 1 | awk '{print $NF}' | tr -d '\r\n')
 export WINDOWS_IP_ADDRESS
 
 # start proxy to Windows. Necessary until https://github.com/microsoft/WSL/issues/4517#issuecomment-621832142
 # is fixed. See comment for details.
 function proxyvpn {
-  if ! powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
+  if ! run_in_win_path powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
     if hash cow-taskbar.exe 2> /dev/null; then
       cow-taskbar.exe &
       disown
     fi
   fi
-  if powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
+  if run_in_win_path powershell.exe -noprofile -c 'Get-Process -Name cow -ErrorAction SilentlyContinue' > /dev/null; then
     export https_proxy="http://$WINDOWS_IP_ADDRESS:7777"
     export http_proxy="http://$WINDOWS_IP_ADDRESS:7777"
   fi
@@ -98,8 +112,8 @@ fi
 source "$DIR"/winhost-set.sh
 
 gpg_agent_running() {
-    powershell.exe -noprofile -NonInteractive -c 'Get-Process gpg-agent -ErrorAction SilentlyContinue | Out-Null' \
-    || gpg-connect-agent.exe /bye
+  run_in_win_path powershell.exe -noprofile -NonInteractive -c 'Get-Process gpg-agent -ErrorAction SilentlyContinue | Out-Null' \
+    || run_in_win_path gpg-connect-agent.exe /bye
 }
 
 forward_gpg() {
@@ -112,13 +126,16 @@ forward_gpg() {
   # This allows for `gpg --card-status` to work
   # see https://support.yubico.com/hc/en-us/articles/360013790259-Using-Your-YubiKey-with-OpenPGP to view how to export a key to yubikey
   LOCALAPPDATA=`windows_env_var LOCALAPPDATA`
+  local wsl_relay
   if ! pgrep --full 'wsl-relay.*--gpg,' &> /dev/null; then
     AGENT_SOCKET_FILE=`gpgconf --list-dir | grep --color=never agent-socket | cut -d: -f2`
     rm -f "$AGENT_SOCKET_FILE"
-    if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    wsl_relay=`find_in_win_path wsl-relay.exe`
+    if [ "$wsl_relay" != '' ]; then
+    # if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
         if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent" ]; then
-          SCREENDIR=$HOME/.screen screen -dmS gpg-agent socat UNIX-LISTEN:"$AGENT_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg',nofork &
+          SCREENDIR=$HOME/.screen screen -dmS gpg-agent socat UNIX-LISTEN:"$AGENT_SOCKET_FILE",fork, EXEC:"$wsl_relay --input-closes --pipe-closes --gpg",nofork &
         fi
       fi
     fi
@@ -126,10 +143,12 @@ forward_gpg() {
   if ! pgrep --full 'wsl-relay.*--gpg=S.gpg-agent.extra,' &> /dev/null; then
     AGENT_EXTRA_SOCKET_FILE=`gpgconf --list-dir | grep --color=never agent-extra-socket | cut -d: -f2`
     rm -f "$AGENT_EXTRA_SOCKET_FILE"
-    if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    wsl_relay=`find_in_win_path wsl-relay.exe`
+    if [ "$wsl_relay" != '' ]; then
+    # if hash wsl-relay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
         if [ -f "$LOCALAPPDATA/gnupg/S.gpg-agent.extra" ]; then
-          SCREENDIR=$HOME/.screen screen -dmS gpg-agent-extra socat UNIX-LISTEN:"$AGENT_EXTRA_SOCKET_FILE",fork, EXEC:'wsl-relay.exe --input-closes --pipe-closes --gpg=S.gpg-agent.extra',nofork &
+          SCREENDIR=$HOME/.screen screen -dmS gpg-agent-extra socat UNIX-LISTEN:"$AGENT_EXTRA_SOCKET_FILE",fork, EXEC:"$wsl_relay --input-closes --pipe-closes --gpg=S.gpg-agent.extra",nofork &
         fi
       fi
     fi
@@ -137,12 +156,13 @@ forward_gpg() {
 }
 
 ensure_gpg_ssh_agent() {
-  if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
+  local cmd
+  if run_in_win_path cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
     return 0
   else
     # start gpg agent in Windows
     if gpg_agent_running; then
-      if cmd.exe /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
+      if $cmd /c 'dir \\.\pipe\\openssh-ssh-agent' &>/dev/null; then
         return 0
       fi
     fi
@@ -157,9 +177,12 @@ forward_ssh() {
       export SSH_AUTH_SOCK
     fi
   else
-    if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
+    local npiperelay
+    npiperelay=`find_in_win_path npiperelay.exe`
+    if [ "$npiperelay" != '' ]; then
+    # if hash npiperelay.exe 2>/dev/null && hash gpg-connect-agent.exe 2>/dev/null; then
       if gpg_agent_running; then
-        SCREENDIR=$HOME/.screen screen -dmS ssh_auth_sock socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,group=giggio,mode=775,fork EXEC:'npiperelay.exe -ei -s //./pipe/openssh-ssh-agent',nofork &
+        SCREENDIR=$HOME/.screen screen -dmS ssh_auth_sock socat UNIX-LISTEN:"$SSH_AUTH_SOCK",unlink-close,unlink-early,group=giggio,mode=775,fork EXEC:"$npiperelay -ei -s //./pipe/openssh-ssh-agent",nofork &
         export SSH_AUTH_SOCK
       fi
     fi
