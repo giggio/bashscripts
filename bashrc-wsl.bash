@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# put your script here for WSL only
+
 if grep '[Mm]icrosoft' /proc/version > /dev/null; then
   export WSL=true
 else
@@ -41,9 +42,10 @@ else
   export RUNNING_IN_CONTAINER=false
 fi
 if ! $WSL || $RUNNING_IN_CONTAINER; then return; fi
-# put your script here for WSL only
-# shellcheck disable=SC2155
-export PATH=`removeWindowsFromPath`
+if [[ $PATH =~ /mnt/.* ]]; then
+  # shellcheck disable=SC2155
+  export PATH=`removeWindowsFromPath`
+fi
 IS_SSH=false
 if [ -v SSH_CLIENT ] || [ -v SSH_TTY ]; then
   IS_SSH=true
