@@ -117,6 +117,10 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
     fi
   else
     eval "`ssh-agent -s -a $SSH_AUTH_SOCK`" > /dev/null
+    if ! [ -d "$HOME"/.ssh ]; then
+      mkdir -p "$HOME/.ssh"
+      chmod 700 "$HOME/.ssh"
+    fi
     echo "$SSH_AGENT_PID" > "$HOME/.ssh/ssh_pid"
   fi
 fi
