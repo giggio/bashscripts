@@ -1,6 +1,6 @@
 # shellcheck disable=SC2139
 # these are aliases that only exist if you are on WSL
-if ! $WSL; then return; fi
+if ! $WSL || $RUNNING_IN_CONTAINER; then return; fi
 alias explorer='"'"`find_in_win_path explorer.exe`"'"'
 alias cmd='"'"`find_in_win_path cmd.exe`"'"'
 alias powershell='"'"`find_in_win_path powershell.exe`"'"'
