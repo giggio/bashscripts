@@ -109,8 +109,8 @@ if hash wslview 2>/dev/null; then
 fi
 
 # resolve `winhost` as windows ip:
-# shellcheck source=winhost-set.sh
-source "$DIR"/winhost-set.sh
+winhost=$(grep nameserver /etc/resolv.conf | awk '{ print $2 }')
+export winhost
 
 gpg_agent_running() {
   run_in_win_path powershell.exe -noprofile -NonInteractive -c 'Get-Process gpg-agent -ErrorAction SilentlyContinue | Out-Null' \
@@ -193,6 +193,3 @@ forward_ssh() {
 forward_gpg
 
 forward_ssh
-
-# setup boot commands for wsl:
-"$DIR"/wsl-boot.sh
