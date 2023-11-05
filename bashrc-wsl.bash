@@ -109,6 +109,7 @@ if hash wslview 2>/dev/null; then
 fi
 
 # resolve `winhost` as windows ip:
+# shellcheck source=winhost-set.sh
 source "$DIR"/winhost-set.sh
 
 gpg_agent_running() {

@@ -1,3 +1,4 @@
+# shellcheck disable=all
 # hub tab-completion script for bash.
 # This script complements the completion script that ships with git.
 

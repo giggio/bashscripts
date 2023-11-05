@@ -1,5 +1,5 @@
-THIS_FILE=$BASH_SOURCE
-THIS_DIR=`dirname $THIS_FILE`
+THIS_FILE="${BASH_SOURCE[0]}"
+THIS_DIR=`dirname "$THIS_FILE"`
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -48,7 +48,7 @@ if hash vim 2>/dev/null; then
 fi
 export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
 N_PREFIX=$HOME/.n
-if [ -d $N_PREFIX ]; then
+if [ -d "$N_PREFIX" ]; then
   export PATH=$N_PREFIX/bin:$PATH
   export N_PREFIX
 fi
@@ -63,22 +63,25 @@ unset DENO_INSTALL
 if [ -d  "$HOME"/.dotnet/tools ] && ! [[ $PATH =~ "$HOME"/.dotnet/tools ]]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
-if [ -f $HOME/.cargo/env ]; then
+if [ -f "$HOME"/.cargo/env ]; then
+  # shellcheck source=/dev/null
   source "$HOME/.cargo/env"
 fi
 if hash sccache 2>/dev/null; then
-  export RUSTC_WRAPPER=`which sccache`
+  RUSTC_WRAPPER=`which sccache`
+  export RUSTC_WRAPPER
 fi
-if [ -e $HOME/.krew/bin/kubectl-krew ]; then
+if [ -e "$HOME"/.krew/bin/kubectl-krew ]; then
   export PATH=$PATH:$HOME/.krew/bin
 fi
-if [ -e $HOME/.go/bin/go ]; then
+if [ -e "$HOME"/.go/bin/go ]; then
   export PATH=$PATH:$HOME/.go/bin
-  if [ -d $HOME/go/bin ]; then
+  if [ -d "$HOME"/go/bin ]; then
     export PATH=$PATH:$HOME/go/bin
   fi
 fi
-export GPG_TTY=$(tty)
+GPG_TTY=$(tty)
+export GPG_TTY
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
@@ -96,9 +99,10 @@ else
   PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] '
 fi
 
-SCRIPTS=`find $THIS_DIR -name '*.bash' -type f -printf '%h\0%d\0%p\n' | sort -t '\0' -n | awk -F'\0' '{print $3}'`
+SCRIPTS=`find "$THIS_DIR" -name '*.bash' -type f -printf '%h\0%d\0%p\n' | sort -t '\0' -n | awk -F'\0' '{print $3}'`
 for SCRIPT in $SCRIPTS; do
-  source $SCRIPT
+  # shellcheck source=/dev/null
+  source "$SCRIPT"
 done
 
 # setup ssh-agent
@@ -108,11 +112,11 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
   if [ -S "$SSH_AUTH_SOCK" ]; then
     export SSH_AUTH_SOCK
     if [ -f "$HOME/.ssh/ssh_pid" ]; then
-      SSH_AGENT_PID="`cat $HOME/.ssh/ssh_pid`"
+      SSH_AGENT_PID="`cat "$HOME"/.ssh/ssh_pid`"
       export SSH_AGENT_PID
     fi
   else
-    eval `ssh-agent -s -a $SSH_AUTH_SOCK` > /dev/null
+    eval "`ssh-agent -s -a $SSH_AUTH_SOCK`" > /dev/null
     echo "$SSH_AGENT_PID" > "$HOME/.ssh/ssh_pid"
   fi
 fi

@@ -1,13 +1,13 @@
 function hasBinary {
-  hash $1 2>/dev/null
+  hash "$1" 2>/dev/null
 }
 
 function hasBinaryInLinux {
   if ! $WSL; then
-    hasBinary $1
+    hasBinary "$1"
     return
   fi
-  PATH=`removeWindowsFromPath` hash $1 2>/dev/null
+  PATH=`removeWindowsFromPath` hash "$1" 2>/dev/null
 }
 
 function man {
@@ -27,11 +27,12 @@ function edit-var {
     echo "Variable with name '${!VAR}' does not exist."
     return
   fi
-  local TMP=`mktemp`
-  echo "${VAR}" > $TMP
-  vim $TMP
-  eval "${!VAR}"'=`cat '$TMP'`'
-  rm $TMP
+  local TMP
+  TMP=`mktemp`
+  echo "${VAR}" > "$TMP"
+  vim "$TMP"
+  eval "${!VAR}"'=`cat '"$TMP"'`'
+  rm "$TMP"
 }
 
 function lorem {
@@ -44,11 +45,12 @@ function lorem {
     fi
     PARAGRAPHS=$1
   fi
-  perl -e 'use Text::Lorem;my $text = Text::Lorem->new();$paragraphs = $text->paragraphs('$PARAGRAPHS');print $paragraphs;'
+  perl -e 'use Text::Lorem;my $text = Text::Lorem->new();$paragraphs = $text->paragraphs('"$PARAGRAPHS"');print $paragraphs;'
 }
 
 function watchrun {
-  while inotifywait -q -e close_write $1; do
-    `realpath $1`
+  while inotifywait -q -e close_write "$1"; do
+    # shellcheck disable=SC2092
+    `realpath "$1"`
   done
 }

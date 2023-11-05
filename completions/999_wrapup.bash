@@ -1,11 +1,11 @@
-if ! [ -d $COMPLETIONS_DIR ]; then
-  mkdir -p $COMPLETIONS_DIR
+if ! [ -d "$COMPLETIONS_DIR" ]; then
+  mkdir -p "$COMPLETIONS_DIR"
   updateCompletions
-  THIS_FILE=$BASH_SOURCE
-  THIS_DIR=`dirname $THIS_FILE`
-  for completionsFile in `echo $THIS_DIR/*.bash`; do
+  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  for completionsFile in `echo "$DIR"/*.bash`; do
     if [ -e "$completionsFile" ]; then
-        source "$completionsFile"
+      # shellcheck source=/dev/null
+      source "$completionsFile"
     fi
   done
 fi

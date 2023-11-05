@@ -5,17 +5,17 @@
 # resolve `winhost` as windows ip, see issue and comment: https://github.com/microsoft/WSL/issues/4619#issuecomment-821142078
 # and https://github.com/microsoft/WSL/issues/4619#issuecomment-966435432
 
-export winhost=$(cat /etc/resolv.conf | grep nameserver | awk '{ print $2 }')
+winhost=$(grep nameserver /etc/resolv.conf | awk '{ print $2 }')
+export winhost
 # return if this script was sourced
 if (return 0 2>/dev/null); then
   return 0
 fi
 
 # update winhost:
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 old_winhost=$(grep -P "[[:space:]]winhost" /etc/hosts | awk '{ print $1 }')
-if [ -z $old_winhost ]; then
-  if [ `id -u` == "0" ]; then
+if [ -z "$old_winhost" ]; then
+  if [ "`id -u`" == '0' ]; then
     echo -e "$winhost\twinhost" >> "/etc/hosts"
   else
     if ! sudo -n true 2> /dev/null; then
@@ -23,8 +23,8 @@ if [ -z $old_winhost ]; then
     fi
     echo -e "$winhost\twinhost" | sudo tee -a "/etc/hosts" > /dev/null
   fi
-elif [ $old_winhost != $winhost ]; then
-  if [ `id -u` == "0" ]; then
+elif [ "$old_winhost" != "$winhost" ]; then
+  if [ "`id -u`" == '0' ]; then
     sed -i "s/$old_winhost\twinhost/$winhost\twinhost/g" /etc/hosts
   else
     if ! sudo -n true 2> /dev/null; then
@@ -35,14 +35,14 @@ elif [ $old_winhost != $winhost ]; then
 fi
 
 # sets owner to root, as this might run as root
-THIS_FILE=$DIR/`basename "$0"`
-if [ `ls -ld $THIS_FILE | awk '{print $3 ":" $4}'` != "root:root" ]; then
-  if [ `id -u` == "0" ]; then
-    chown root:root $THIS_FILE
+THIS_FILE="${BASH_SOURCE[0]}"
+if [ "`stat -c '%U:%G'`" != "root:root" ]; then
+  if [ "`id -u`" == '0' ]; then
+    chown root:root "$THIS_FILE"
   else
     if ! sudo -n true 2> /dev/null; then
       echo "Will update script ($THIS_FILE) file owner, needs auth:"
     fi
-    sudo chown root:root $THIS_FILE
+    sudo chown root:root "$THIS_FILE"
   fi
 fi

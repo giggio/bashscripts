@@ -4,7 +4,7 @@
 # See https://learn.microsoft.com/en-us/windows/wsl/wsl-config#boot-settings
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-THIS_FILE=$DIR/`basename "$0"`
+THIS_FILE="${BASH_SOURCE[0]}"
 if (return 0 2>/dev/null); then
   echo "Don't source this script ($THIS_FILE)."
   exit 1
@@ -25,7 +25,7 @@ if [ "$EUID" != "0" ]; then
     if ! sudo -n true 2> /dev/null; then
       echo "Will run this script ($THIS_FILE) as root, needs auth:"
     fi
-    sudo $THIS_FILE
+    sudo "$THIS_FILE"
   fi
   exit 0
 fi
@@ -53,8 +53,8 @@ if not config.has_option('automount', 'options') or config['automount']['options
 EOF
 
 # sets owner to root, as this might run as root
-if [ `ls -ld $THIS_FILE | awk '{print $3 ":" $4}'` != "root:root" ]; then
-  sudo chown root:root $THIS_FILE
+if [ "`stat -c '%U:%G'`" != "root:root" ]; then
+  sudo chown root:root "$THIS_FILE"
 fi
 
 # start cron, add '%sudo ALL=NOPASSWD: /etc/init.d/cron start' via visudo if this fails
@@ -64,4 +64,4 @@ if ! pgrep cron > /dev/null; then
   fi
 fi
 
-sudo $DIR/winhost-set.sh
+sudo "$DIR"/winhost-set.sh

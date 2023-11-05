@@ -10,8 +10,9 @@ if ! shopt -oq posix; then
 fi
 
 function addCompletion {
-  if [ -f $1 ]; then
-    source $1
+  if [ -f "$1" ]; then
+    # shellcheck source=/dev/null
+    source "$1"
   fi
 }
 

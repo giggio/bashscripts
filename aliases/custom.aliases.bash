@@ -1,8 +1,10 @@
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $DIR/../lib/complete-alias/complete_alias
+# shellcheck source=/dev/null
+source "$DIR"/../lib/complete-alias/complete_alias
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
+  # shellcheck disable=SC2015 # we want to eval in the end in either case
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
   alias ls='ls --color=auto'
   #alias dir='dir --color=auto'
@@ -52,8 +54,10 @@ fi
 if hash kubectl 2>/dev/null; then
   if [ -f "$DIR"/../lib/kubectl-aliases/.kubectl_aliases ]; then
     if hash kubecolor 2>/dev/null; then
+      # shellcheck source=/dev/null
       source "$DIR"/../lib/kubectl-aliases/.kubecolor_aliases
     else
+      # shellcheck source=/dev/null
       source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
     fi
     ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
