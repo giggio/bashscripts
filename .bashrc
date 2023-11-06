@@ -124,3 +124,5 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
     echo "$SSH_AGENT_PID" > "$HOME/.ssh/ssh_pid"
   fi
 fi
+
+# export SYSTEMD_LESS=FRSMK
