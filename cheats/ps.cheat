@@ -1,0 +1,4 @@
+% ps
+
+# Show ps tree
+ps -ef --forest

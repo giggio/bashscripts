@@ -1,0 +1,84 @@
+% systemd
+
+# Stop service
+sudo systemctl stop <service>
+$ service: systemctl list-units --type=service --no-pager --no-legend --state=running --plain | cut -d " " -f 1
+
+# Start service
+sudo systemctl start <service>
+$ service: systemctl list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Restart service
+sudo systemctl restart <service>
+$ service: systemctl list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show service status
+systemctl status <service>
+$ service: systemctl list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show service details
+systemctl show <service>
+$ service: systemctl list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show service logs
+journalctl -u <service>
+$ service: systemctl list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Reload daemon
+sudo systemctl daemon-reload
+
+# Show failed units
+systemctl --failed
+
+# Show targets
+systemctl list-unit-files --type=target
+
+# Is system running?
+systemctl is-system-running
+
+# logind status
+systemctl status systemd-logind
+
+# View dbus socket
+ls -lah /run/dbus/system_bus_socket
+
+% systemd user
+
+# Stop user service
+systemctl --user stop <service>
+$ service: systemctl --user list-units --type=service --no-pager --no-legend --state=running --plain | cut -d " " -f 1
+
+# Start user service
+systemctl --user start <service>
+$ service: systemctl --user list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Restart user service
+systemctl --user restart <service>
+$ service: systemctl --user list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show user service status
+systemctl --user status <service>
+$ service: systemctl --user list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show user service details
+systemctl --user show <service>
+$ service: systemctl --user list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Show user service logs
+journalctl --user -u <service>
+$ service: systemctl --user list-unit-files --type=service --no-pager --no-legend | cut -d " " -f 1
+
+# Reload user daemon
+systemctl --user daemon-reload
+
+# Show failed user units
+systemctl --user --failed
+
+# View user folder
+echo $XDG_RUNTIME_DIR; ls -lah $XDG_RUNTIME_DIR
+
+# Login sessions
+loginctl
+
+# Show user targets
+systemctl --user list-unit-files --type=target
