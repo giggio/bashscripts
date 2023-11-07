@@ -1,0 +1,13 @@
+% gpg
+
+# List directories
+gpgconf --list-dir
+
+# Card status
+gpg --card-status
+
+# List keys
+gpg --list-keys
+
+# List secret keys
+gpg --list-secret-keys

@@ -33,6 +33,15 @@ systemctl --failed
 # Show targets
 systemctl list-unit-files --type=target
 
+# Show sockets
+systemctl list-unit-files --type=socket
+
+# Show services
+systemctl list-unit-files --type=service
+
+# Show timers
+systemctl list-unit-files --type=timer
+
 # Is system running?
 systemctl is-system-running
 
@@ -41,6 +50,9 @@ systemctl status systemd-logind
 
 # View dbus socket
 ls -lah /run/dbus/system_bus_socket
+
+# Clear journalctl logs
+sudo journalctl --rotate; sudo journalctl --vacuum-time=1s
 
 % systemd user
 
@@ -82,3 +94,12 @@ loginctl
 
 # Show user targets
 systemctl --user list-unit-files --type=target
+
+# Show user sockets
+systemctl --user list-unit-files --type=socket
+
+# Show user services
+systemctl --user list-unit-files --type=service
+
+# Show user timers
+systemctl --user list-unit-files --type=timer
