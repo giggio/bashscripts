@@ -80,8 +80,6 @@ if [ -e "$HOME"/.go/bin/go ]; then
     export PATH=$PATH:$HOME/go/bin
   fi
 fi
-GPG_TTY=$(tty)
-export GPG_TTY
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
@@ -105,10 +103,15 @@ for SCRIPT in $SCRIPTS; do
   source "$SCRIPT"
 done
 
+if ! $WSL; then
+  GPG_TTY=$(tty)
+  export GPG_TTY
+fi
+
 # setup ssh-agent
 # only setup ssh agent if not previosly set
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  SSH_AUTH_SOCK=/tmp/ssh_agent_socket
+if ! [ -v SSH_AUTH_SOCK ]; then
+  SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}gnupg/ssh.sock
   if [ -S "$SSH_AUTH_SOCK" ]; then
     export SSH_AUTH_SOCK
     if [ -f "$HOME/.ssh/ssh_pid" ]; then
