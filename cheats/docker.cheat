@@ -26,4 +26,13 @@ docker run --net=host --ipc=host --uts=host --pid=host -it --security-opt=seccom
 ;chroot /host
 
 # Sort images by size
-docker images <image_name> | sort -k7 -h
+docker images <image_name> | tail -n +2 | sort -k7 -h
+
+# Sort all images by size
+docker images | tail -n +2 | sort -k7 -h
+
+# System storage summary
+docker system df
+
+# Clear build cache
+docker builder prune
