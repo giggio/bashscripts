@@ -1,3 +1,3 @@
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck source=/dev/null
-source "$DIR"/../lib/z/z.sh
+if hash zoxide 2>/dev/null; then
+  eval "`zoxide init bash`"
+fi
