@@ -39,6 +39,8 @@ alias ci='git commit'
 complete -F _complete_alias ci
 alias push='git push'
 complete -F _complete_alias push
+alias pushf='git push --force-with-lease'
+complete -F _complete_alias pushf
 alias co='git checkout'
 complete -F _complete_alias co
 alias pull='git pull'
@@ -83,6 +85,8 @@ if hash pygmentize 2>/dev/null; then
 fi
 alias cd-='cd -'
 alias cd..='cd ..'
+alias cd...='cd ../..'
+alias cd....='cd ../../..'
 alias weather='curl -s wttr.in'
 
 if ! hash bat 2>/dev/null && hash batcat 2>/dev/null; then
