@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+    paths-ignore:
+      - "*.md"
+      - "*.txt"
+      - "*.yml"
+      - .editorconfig
+      - ".github/**"
+      - .gitignore
+      - .gitattributes
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "*.md"
+      - "*.txt"
+      - "*.yml"
+      - .editorconfig
+      - ".github/**"
+      - .gitignore
+      - .gitattributes
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Shellcheck
+        uses: reviewdog/action-shellcheck@v1
+        with:
+          reporter: ${{ github.event_name == 'pull_request' && 'github-pr-review' || 'github-check' }}
+          path: "."
+          pattern: "*.sh"
