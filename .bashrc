@@ -108,6 +108,12 @@ if ! $WSL; then
   export GPG_TTY
 fi
 
+# I was considering using githhoks in templating mode, but I think I prefer manual mode
+# I will leave this here in case I change my mind
+# if [ -d "$HOME"/.gittemplate ] && [ -x "$(git config githooks.runner | envsubst)" ]; then
+#   export GIT_TEMPLATE_DIR="$HOME"/.gittemplate
+# fi
+
 # setup ssh-agent
 # only setup ssh agent if not previosly set
 if ! [ -v SSH_AUTH_SOCK ]; then
