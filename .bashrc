@@ -47,6 +47,8 @@ if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
 export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
+export TMP=/tmp
+export TEMP=/tmp
 N_PREFIX=$HOME/.n
 if [ -d "$N_PREFIX" ]; then
   export PATH=$N_PREFIX/bin:$PATH
