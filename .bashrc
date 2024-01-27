@@ -116,10 +116,23 @@ fi
 #   export GIT_TEMPLATE_DIR="$HOME"/.gittemplate
 # fi
 
+if ! [ -v XDG_RUNTIME_DIR ]; then
+  export XDG_RUNTIME_DIR=/run/user/`id -u`/
+  if ! [ -d "$XDG_RUNTIME_DIR" ]; then
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 755 "$XDG_RUNTIME_DIR"
+  fi
+fi
+
 # setup ssh-agent
 # only setup ssh agent if not previosly set
 if ! [ -v SSH_AUTH_SOCK ]; then
-  SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}gnupg/ssh.sock
+  SSH_DIR=${XDG_RUNTIME_DIR}gnupg
+  if ! [ -d "$SSH_DIR" ]; then
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+  fi
+  SSH_AUTH_SOCK="$SSH_DIR"/ssh.sock
   if [ -S "$SSH_AUTH_SOCK" ]; then
     export SSH_AUTH_SOCK
     if [ -f "$HOME/.ssh/ssh_pid" ]; then
@@ -127,7 +140,7 @@ if ! [ -v SSH_AUTH_SOCK ]; then
       export SSH_AGENT_PID
     fi
   else
-    eval "`ssh-agent -s -a $SSH_AUTH_SOCK`" > /dev/null
+    eval "`ssh-agent -s -a "$SSH_AUTH_SOCK"`" > /dev/null
     if ! [ -d "$HOME"/.ssh ]; then
       mkdir -p "$HOME/.ssh"
       chmod 700 "$HOME/.ssh"
