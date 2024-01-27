@@ -2,11 +2,6 @@
 
 # put your script here for WSL only
 
-if uname -a | grep android &> /dev/null; then
-  export ANDROID=true
-else
-  export ANDROID=false
-fi
 if grep '[Mm]icrosoft' /proc/version &> /dev/null; then
   export WSL=true
 else
