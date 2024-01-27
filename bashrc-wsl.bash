@@ -2,7 +2,7 @@
 
 # put your script here for WSL only
 
-if grep '[Mm]icrosoft' /proc/version &> /dev/null; then
+if grep '[Mm]icrosoft' /proc/version -q &> /dev/null; then
   export WSL=true
 else
   export WSL=false
