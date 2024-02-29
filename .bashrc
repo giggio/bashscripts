@@ -43,6 +43,14 @@ esac
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# if hash nix-env 2>/dev/null; then
+#   LOCALE_ARCHIVE="$(nix-env --installed --no-name --out-path --query glibc-locales)/lib/locale/locale-archive"
+#   export LOCALE_ARCHIVE
+# fi
+if [ -f "$HOME"/.nix-profile/etc/profile.d/hm-session-vars.sh ]; then
+  # shellcheck source=/dev/null
+  source "$HOME"/.nix-profile/etc/profile.d/hm-session-vars.sh
+fi
 if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
@@ -54,14 +62,6 @@ if [ -d "$N_PREFIX" ]; then
   export PATH=$N_PREFIX/bin:$PATH
   export N_PREFIX
 fi
-DENO_INSTALL=$HOME/.deno/bin
-if hash dvm 2>/dev/null || [ -x "$DENO_INSTALL"/deno ]; then
-  if ! [ -d "$DENO_INSTALL" ]; then
-    mkdir -p "$DENO_INSTALL"
-  fi
-  export PATH=$DENO_INSTALL:$PATH
-fi
-unset DENO_INSTALL
 if [ -d  "$HOME"/.dotnet/tools ] && ! [[ $PATH =~ "$HOME"/.dotnet/tools ]]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
@@ -73,7 +73,7 @@ if hash sccache 2>/dev/null; then
   RUSTC_WRAPPER=`which sccache`
   export RUSTC_WRAPPER
 fi
-if [ -e "$HOME"/.krew/bin/kubectl-krew ]; then
+if [ -d "$HOME"/.krew/bin ]; then
   export PATH=$PATH:$HOME/.krew/bin
 fi
 if [ -e "$HOME"/.go/bin/go ]; then
@@ -117,7 +117,8 @@ fi
 # fi
 
 if ! [ -v XDG_RUNTIME_DIR ]; then
-  export XDG_RUNTIME_DIR=/run/user/`id -u`/
+  XDG_RUNTIME_DIR=/run/user/`id -u`/
+  export XDG_RUNTIME_DIR
   if ! [ -d "$XDG_RUNTIME_DIR" ]; then
     mkdir -p "$XDG_RUNTIME_DIR"
     chmod 755 "$XDG_RUNTIME_DIR"
@@ -127,7 +128,7 @@ fi
 # setup ssh-agent
 # only setup ssh agent if not previosly set
 if ! [ -v SSH_AUTH_SOCK ]; then
-  SSH_DIR=${XDG_RUNTIME_DIR}gnupg
+  SSH_DIR=$XDG_RUNTIME_DIR/gnupg
   if ! [ -d "$SSH_DIR" ]; then
     mkdir -p "$SSH_DIR"
     chmod 700 "$SSH_DIR"
