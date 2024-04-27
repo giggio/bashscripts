@@ -127,7 +127,12 @@ fi
 
 # setup ssh-agent
 # only setup ssh agent if not previosly set
-if ! [ -v SSH_AUTH_SOCK ]; then
+if [ -v SSH_AUTH_SOCK ]; then
+  if [ -S "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh" ]; then
+    SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh
+    export SSH_AUTH_SOCK
+  fi
+else
   SSH_DIR=$XDG_RUNTIME_DIR/gnupg
   if ! [ -d "$SSH_DIR" ]; then
     mkdir -p "$SSH_DIR"
