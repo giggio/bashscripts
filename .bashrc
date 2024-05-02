@@ -125,34 +125,33 @@ if ! [ -v XDG_RUNTIME_DIR ]; then
   fi
 fi
 
-# setup ssh-agent
-# only setup ssh agent if not previosly set
-if [ -v SSH_AUTH_SOCK ]; then
-  if [ -S "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh" ]; then
-    SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh
-    export SSH_AUTH_SOCK
-  fi
+# setup ssh socket
+if $WSL; then
+  # forward ssh socket to Windows
+  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/ssh.sock"
 else
-  SSH_DIR=$XDG_RUNTIME_DIR/gnupg
-  if ! [ -d "$SSH_DIR" ]; then
-    mkdir -p "$SSH_DIR"
-    chmod 700 "$SSH_DIR"
-  fi
-  SSH_AUTH_SOCK="$SSH_DIR"/ssh.sock
-  if [ -S "$SSH_AUTH_SOCK" ]; then
-    export SSH_AUTH_SOCK
-    if [ -f "$HOME/.ssh/ssh_pid" ]; then
-      SSH_AGENT_PID="`cat "$HOME"/.ssh/ssh_pid`"
-      export SSH_AGENT_PID
+  if [ -S "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh" ]; then
+    # forward ssh socket to gpg
+    export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+  elif ! [ -v SSH_AUTH_SOCK ]; then
+    PID_FILE="$HOME/.ssh/ssh_pid"
+    SSH_AUTH_SOCK="$HOME/.ssh/ssh.sock"
+    if [ -S "$SSH_AUTH_SOCK" ]; then
+      # use existing ssh-agent
+      export SSH_AUTH_SOCK
+      if [ -f "$PID_FILE" ]; then
+        SSH_AGENT_PID="`cat "$PID_FILE"`"
+        export SSH_AGENT_PID
+      fi
+    else
+      # start a new ssh-agent
+      if ! [ -d "$HOME"/.ssh ]; then
+        mkdir -p "$HOME/.ssh"
+        chmod 700 "$HOME/.ssh"
+      fi
+      eval "`ssh-agent -s -a "$SSH_AUTH_SOCK"`" > /dev/null
+      echo "$SSH_AGENT_PID" > "$PID_FILE"
     fi
-  else
-    eval "`ssh-agent -s -a "$SSH_AUTH_SOCK"`" > /dev/null
-    if ! [ -d "$HOME"/.ssh ]; then
-      mkdir -p "$HOME/.ssh"
-      chmod 700 "$HOME/.ssh"
-    fi
-    echo "$SSH_AGENT_PID" > "$HOME/.ssh/ssh_pid"
   fi
 fi
 
-# export SYSTEMD_LESS=FRSMK
