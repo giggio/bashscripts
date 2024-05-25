@@ -130,7 +130,7 @@ if $WSL; then
   # forward ssh socket to Windows
   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/ssh.sock"
 else
-  if [ -S "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh" ]; then
+  if [ -S "$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh" ] || systemctl --user is-enabled gpg-agent-ssh.socket -q &> /dev/null; then
     # forward ssh socket to gpg
     export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
   elif ! [ -v SSH_AUTH_SOCK ]; then
