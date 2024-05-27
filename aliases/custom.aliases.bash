@@ -6,7 +6,7 @@ source "$DIR"/../lib/complete-alias/complete_alias
 if [ -x /usr/bin/dircolors ]; then
   # shellcheck disable=SC2015 # we want to eval in the end in either case
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-  alias ls='ls --color=auto'
+  alias ls='ls --color=auto --hyperlink=always'
   #alias dir='dir --color=auto'
   #alias vdir='vdir --color=auto'
 
@@ -17,7 +17,7 @@ fi
 
 # some more ls aliases
 if hash eza 2>/dev/null; then
-  alias ll='eza --long --group --all --all --group-directories-first'
+  alias ll='eza --long --group --all --all --group-directories-first --hyperlink'
 else
   alias ll='ls -alF'
 fi
@@ -96,4 +96,8 @@ fi
 
 if hash github-copilot-cli 2>/dev/null; then
   eval "$(github-copilot-cli alias -- "$0")"
+fi
+
+if hash kitty 2>/dev/null; then
+  alias mg='kitty +kitten hyperlinked_grep --smart-case'
 fi
