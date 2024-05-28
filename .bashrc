@@ -17,8 +17,10 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=20000
-HISTFILESIZE=20000
+HISTSIZE=-1
+HISTFILESIZE=-1
+# see https://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
+HISTFILE=~/.bash_history2
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -84,7 +86,7 @@ if [ -e "$HOME"/.go/bin/go ]; then
     export PATH=$PATH:$HOME/go/bin
   fi
 fi
-export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
 bind '"jj":"\e"'
