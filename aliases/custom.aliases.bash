@@ -101,3 +101,5 @@ fi
 if hash kitty 2>/dev/null; then
   alias mg='kitty +kitten hyperlinked_grep --smart-case'
 fi
+
+alias hm='home-manager --flake ~/.dotfiles/config/home-manager --impure'
