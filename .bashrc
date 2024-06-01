@@ -56,16 +56,9 @@ fi
 if hash vim 2>/dev/null; then
   export EDITOR=vim
 fi
-export PATH=$THIS_DIR/bin:$HOME/bin:$HOME/.local/bin:$PATH
+export PATH=$THIS_DIR/bin:$PATH
 export TMP=/tmp
 export TEMP=/tmp
-if ! [ -v N_PREFIX ]; then
-  N_PREFIX=$HOME/.n
-  if [ -d "$N_PREFIX" ]; then
-    export PATH=$N_PREFIX/bin:$PATH
-    export N_PREFIX
-  fi
-fi
 if [ -d  "$HOME"/.dotnet/tools ] && ! [[ $PATH =~ "$HOME"/.dotnet/tools ]]; then
   export PATH=$PATH:$HOME/.dotnet/tools
 fi
@@ -158,4 +151,3 @@ else
     fi
   fi
 fi
-
