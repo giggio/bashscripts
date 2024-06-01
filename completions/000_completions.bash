@@ -1,14 +1,3 @@
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
 function addCompletion {
   if [ -f "$1" ]; then
     # shellcheck source=/dev/null
@@ -17,7 +6,11 @@ function addCompletion {
 }
 
 updateCompletionsCommands=''
-export COMPLETIONS_DIR=$HOME/.completions
+if [ -v XDG_DATA_HOME ]; then
+  export COMPLETIONS_DIR=$XDG_DATA_HOME/bash-completion/completions/
+else
+  export COMPLETIONS_DIR=$HOME/.local/share/bash-completion/completions/
+fi
 function updateCompletions {
   echo Updating completions...
   mkdir -p "$COMPLETIONS_DIR"
