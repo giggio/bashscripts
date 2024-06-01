@@ -13,6 +13,10 @@ exec_files=$(find $diff_files -exec sh -c 'head -n1 $1 | grep -qE '"'"'^#!(.*/|\
 # shellcheck disable=SC2086
 sh_files=$(find $diff_files \( -name '*.sh' -or -name '*.bash' \))
 all_files=`echo -e "$sh_files\n$exec_files" | sort | uniq`
+if [ -z "$all_files" ]; then
+  echo "No shell files found to check"
+  exit 0
+fi
 echo "Running shellcheck on the following files:"
 echo "$all_files"
 # shellcheck disable=SC2086
