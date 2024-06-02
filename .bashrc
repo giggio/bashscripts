@@ -73,12 +73,6 @@ fi
 if [ -d "$HOME"/.krew/bin ]; then
   export PATH=$PATH:$HOME/.krew/bin
 fi
-if [ -e "$HOME"/.go/bin/go ]; then
-  export PATH=$PATH:$HOME/.go/bin
-  if [ -d "$HOME"/go/bin ]; then
-    export PATH=$PATH:$HOME/go/bin
-  fi
-fi
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 export LC_ALL=en_US.UTF-8
 set -o vi
