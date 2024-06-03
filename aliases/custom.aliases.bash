@@ -1,6 +1,4 @@
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=/dev/null
-source "$DIR"/../lib/complete-alias/complete_alias
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -30,25 +28,15 @@ alias cls=clear
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 alias add='git add'
-complete -F _complete_alias add
 alias st='git status'
-complete -F _complete_alias st
 alias log='git log'
-complete -F _complete_alias log
 alias ci='git commit'
-complete -F _complete_alias ci
 alias push='git push'
-complete -F _complete_alias push
 alias pushf='git push --force-with-lease'
-complete -F _complete_alias pushf
 alias co='git checkout'
-complete -F _complete_alias co
 alias pull='git pull'
-complete -F _complete_alias pull
 alias fixup='git fixup'
-complete -F _complete_alias fixup
 alias dif='git diff'
-complete -F _complete_alias dif
 alias pushsync='git push --set-upstream origin `git rev-parse --abbrev-ref HEAD`'
 if hash hub 2>/dev/null; then
   alias git=hub
@@ -62,20 +50,12 @@ if hash kubectl 2>/dev/null; then
       # shellcheck source=/dev/null
       source "$DIR"/../lib/kubectl-aliases/.kubectl_aliases
     fi
-    ALIASES=$(awk -F'[ =]' '/^alias / {print $2}' "$DIR"/../lib/kubectl-aliases/.kubectl_aliases)
-    for ALIAS in $ALIASES; do
-      complete -F _complete_alias "$ALIAS"
-    done
-    unset ALIASES
-    unset ALIAS
   else
     alias k=kubectl
-    complete -F _complete_alias k
   fi
 fi
 if hash istioctl 2>/dev/null; then
   alias istio=istioctl
-  complete -F _complete_alias istio
 fi
 if hash terraform 2>/dev/null; then
   alias tf=terraform
@@ -103,3 +83,18 @@ if hash kitty 2>/dev/null; then
 fi
 
 alias hm='home-manager --flake ~/.dotfiles/config/home-manager --impure'
+
+function gitignore () {
+  if [ -v 1 ]; then
+    case "$1" in
+      -v|--version|-h|--help|-l|--list)
+      git-ignore "$@"
+      ;;
+      *)
+      git-ignore "$@" > .gitignore
+      ;;
+    esac
+  else
+    git-ignore -a > .gitignore
+  fi
+}
