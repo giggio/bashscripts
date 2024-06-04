@@ -83,12 +83,12 @@ export INPUTRC=$THIS_DIR/.inputrc
 
 bind 'set completion-ignore-case on'
 
-if hash starship 2>/dev/null; then
-  eval "$(starship init bash)"
-else
-  echo "Install Starship to get a nice theme. Go to: https://starship.rs/"
-  PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] '
-fi
+# if hash starship 2>/dev/null; then
+#   eval "$(starship init bash)"
+# else
+#   echo "Install Starship to get a nice theme. Go to: https://starship.rs/"
+#   PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w \$\[\033[00m\] '
+# fi
 
 SCRIPTS=`find "$THIS_DIR" -name '*.bash' -type f -printf '%h\0%d\0%p\n' | sort -t '\0' -n | awk -F'\0' '{print $3}'`
 for SCRIPT in $SCRIPTS; do
@@ -100,12 +100,6 @@ if ! $WSL; then
   GPG_TTY=$(tty)
   export GPG_TTY
 fi
-
-# I was considering using githhoks in templating mode, but I think I prefer manual mode
-# I will leave this here in case I change my mind
-# if [ -d "$HOME"/.gittemplate ] && [ -x "$(git config githooks.runner | envsubst)" ]; then
-#   export GIT_TEMPLATE_DIR="$HOME"/.gittemplate
-# fi
 
 if ! [ -v XDG_RUNTIME_DIR ]; then
   XDG_RUNTIME_DIR=/run/user/`id -u`/
