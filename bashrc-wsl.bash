@@ -55,19 +55,6 @@ else
   esac
 fi
 export IS_SSH
-if [ -v WSL_INTEROP ] || [ -v WSL_INTEGRATION_CACHE ]; then
-  export WSLVersion=2
-else
-  export WSLVersion=1
-fi
-if [ "$WSLVersion" == "1" ]; then
-  export DOCKER_HOST="unix://$HOME/sockets/docker.sock"
-  if hash tmux 2>/dev/null && hash docker-relay 2>/dev/null; then
-    if ! pgrep socat > /dev/null; then
-      tmux new -s docker-relay-session -d docker-relay
-    fi
-  fi
-fi
 
 # shellcheck disable=SC2155
 export WHOME=`windows_env_var USERPROFILE`
