@@ -1,19 +1,24 @@
-# My bash files
+# My Bash files
+
+Main repo: [codeberg.org/giggio/bashscripts](https://codeberg.org/giggio/bashscripts)
 
 These are my bash files. It uses
 [starship](https://starship.rs/)
 to customize the prompt, so you need it in PATH.
 
 This repo will work better with
-[my dotfiles](https://github.com/giggio/dotfiles).
+[my dotfiles](https://codeberg.org/giggio/dotfiles).
 
 ## Installation
 
 * Clone this repo to ~/bashscripts:
+
 ````bash
-  git clone --recurse-submodules https://github.com/giggio/bashscripts
+  git clone --recurse-submodules https://codeberg.org/giggio/bashscripts
 ````
+
 * Add this line to the end of your `~/.bashrc` or `~/.bash_profile`:
+
 ````bash
 source $HOME/bashscripts/.bashrc
 ````
@@ -25,7 +30,9 @@ more files. Files are sorted and directories closer to the root of the repo will
 run first.
 
 ## Author
-[Giovanni Bassi](https://github.com/giggio)
+
+[Giovanni Bassi](https://links.giggio.net/bio)
 
 ## License
+
 Licensed under the Apache License, Version 2.0.
