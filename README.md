@@ -2,6 +2,10 @@
 
 Main repo: [codeberg.org/giggio/bashscripts](https://codeberg.org/giggio/bashscripts)
 
+**Notice**: Most of this repo has been moved into my
+[home-manager configuration](https://codeberg.org/giggio/dotfiles/src/branch/main/home-manager),
+which is in my dotfiles.
+
 These are my bash files. It uses
 [starship](https://starship.rs/)
 to customize the prompt, so you need it in PATH.
